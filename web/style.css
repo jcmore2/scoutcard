@@ -68,17 +68,44 @@ h1 {
   margin: 12px 0 20px;
 }
 
-.stamp {
-  display: inline-block;
+.hero-showcase {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 28px;
+  margin: 28px 0 8px;
+}
+
+.showcase-card {
+  width: 132px;
+  transition: transform 0.2s ease;
+}
+
+.showcase-card svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.5));
+}
+
+.showcase-fut {
+  transform: rotate(-7deg);
+}
+
+.showcase-tcg {
+  transform: rotate(7deg) translateY(10px);
+}
+
+.showcase-card:hover {
+  transform: rotate(0deg) translateY(-6px);
+}
+
+.privacy-inline {
+  text-align: center;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.72rem;
-  font-weight: 500;
-  color: var(--paper);
-  background: var(--surface);
-  border: 1px solid var(--gold-dim);
-  border-radius: 999px;
-  padding: 8px 16px;
-  margin: 0;
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin: 0 0 20px;
 }
 
 .ticket-divider {
