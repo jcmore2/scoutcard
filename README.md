@@ -24,7 +24,16 @@ https://raw.githubusercontent.com/<you>/<repo>/main/<path-to-card>.svg
 "Self-updating" here means "re-run the generator and push" rather than
 "recomputed live per visitor." No Vercel, no Redis, no cost.
 
-## How it works
+## Web app (no install required)
+
+**[jcmore2.github.io/linkedinfut](https://jcmore2.github.io/linkedinfut/)**
+— drop your export `.zip` in the browser and get your card instantly. It's a
+static page (built by GitHub Actions, hosted on GitHub Pages) that parses the
+zip entirely client-side with JavaScript — nothing is ever uploaded anywhere,
+not even to this project. Close the tab and the data is gone. Click
+"Download card.svg" to save the result and embed/commit it yourself.
+
+## CLI (generates a card you commit to this repo)
 
 1. Export your own data from LinkedIn: **Settings & Privacy → Data Privacy →
    Get a copy of your data**. Request at least: Profile, Positions, Skills,
@@ -78,8 +87,19 @@ just your own aggregated stats) is meant to be committed and public.
 
 ## Limitations of the "just GitHub" approach
 
-- No live per-visitor rendering — updating your card is a manual
-  re-export + re-run + push, not automatic.
 - No arbitrary-username lookup like `gitfut.com/<anyone>` — this only ever
-  works from a data export the profile owner has themselves.
+  works from a data export the profile owner uploads themselves, since
+  LinkedIn has no public API for looking up other people's profiles.
+- The web app renders the card live per visit, but nothing is stored —
+  there's no shareable `linkedinfut.../jcmore2` URL. Persisting a card at a
+  permanent URL still means downloading it and committing it yourself (the
+  CLI path above), since there's no backend to save it for you.
 - Scoring constants are unvalidated placeholders (see above).
+
+## Local development
+
+```bash
+npm install
+npm run dev:web    # http://localhost:5173, hot reload
+npm run build:web  # production build to web/dist, what CI deploys
+```

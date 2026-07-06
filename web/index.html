@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LinkedInFut — your LinkedIn, rated out of 99</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>LinkedIn<span class="accent">Fut</span></h1>
+        <p class="tagline">Your LinkedIn, rated out of 99 ⚽</p>
+      </header>
+
+      <section class="privacy-note">
+        <strong>Nothing is uploaded anywhere.</strong> Your export is parsed
+        entirely in this browser tab with JavaScript — it never touches a
+        server. Close the tab and it's gone.
+      </section>
+
+      <section class="steps">
+        <ol>
+          <li>
+            On LinkedIn: <strong>Settings &amp; Privacy → Data Privacy → Get a
+            copy of your data</strong>. Request at least Profile, Positions,
+            Skills, Connections, Recommendations, Endorsements, Shares, Comments.
+          </li>
+          <li>Download the <code>.zip</code> LinkedIn emails you.</li>
+          <li>Drop it below.</li>
+        </ol>
+      </section>
+
+      <section class="uploader">
+        <label for="file-input" id="drop-zone">
+          <span id="drop-label">Drop your LinkedIn export .zip here, or click to choose a file</span>
+          <input id="file-input" type="file" accept=".zip" />
+        </label>
+
+        <div class="controls">
+          <label for="country-input">Country code (optional, e.g. US)</label>
+          <input id="country-input" type="text" maxlength="2" placeholder="US" />
+        </div>
+
+        <p id="status" role="status"></p>
+      </section>
+
+      <section id="result" hidden>
+        <div id="card-container"></div>
+        <button id="download-btn">Download card.svg</button>
+      </section>
+
+      <footer>
+        <a href="https://github.com/jcmore2/linkedinfut" target="_blank" rel="noopener">Source on GitHub</a>
+      </footer>
+    </main>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
