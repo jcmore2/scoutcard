@@ -22,6 +22,27 @@ function parseMonthYear(value: string): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+// Prefers a still-ongoing role (no "Finished On") with the latest start
+// date; falls back to the most recently started role if none are ongoing.
+function findCurrentCompany(positionRows: Row[]): string {
+  const entries = positionRows
+    .map((r) => ({
+      company: findColumn(r, ["Company Name"]),
+      started: parseMonthYear(findColumn(r, ["Started On"])),
+      ongoing: findColumn(r, ["Finished On"]).trim() === "",
+    }))
+    .filter((e) => e.company);
+  if (entries.length === 0) return "";
+
+  const pool = entries.some((e) => e.ongoing) ? entries.filter((e) => e.ongoing) : entries;
+  const latest = pool.reduce((best, e) => {
+    if (!best.started) return e;
+    if (!e.started) return best;
+    return e.started.getTime() > best.started.getTime() ? e : best;
+  });
+  return latest.company;
+}
+
 function loadRows(getFile: FileLookup, nameMatch: RegExp, label: string): Row[] {
   const raw = getFile(nameMatch);
   if (!raw) {
@@ -63,6 +84,8 @@ export function extractProfile(getFile: FileLookup): ParsedProfile {
     ? (Date.now() - earliestStart.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
     : 0;
 
+  const company = findCurrentCompany(positionRows);
+
   const skillCount = new Set(skillRows.map((r) => findColumn(r, ["Name"]).toLowerCase()).filter(Boolean)).size;
 
   const oneYearAgo = Date.now() - 365 * 24 * 60 * 60 * 1000;
@@ -76,6 +99,7 @@ export function extractProfile(getFile: FileLookup): ParsedProfile {
     firstName,
     lastName,
     headline,
+    company,
     positionYears: Math.max(0, positionYears),
     skillCount,
     connectionCount: connectionRows.length,

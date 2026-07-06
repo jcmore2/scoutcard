@@ -1,5 +1,6 @@
 import { parseExportFile } from "./lib/parseExportBrowser.js";
 import { parseProfilePdfFile } from "./lib/parsePdfBrowser.js";
+import { loadFlagGraphic } from "./lib/flagSvgBrowser.js";
 import { computeStats, computeOverall, computeTier, computeArchetype } from "../src/scoring.js";
 import { computeStatsFromPdfProfile } from "../src/pdf/scoringPdf.js";
 import { renderCardStyled } from "../src/renderCardStyled.js";
@@ -150,11 +151,15 @@ async function handleZipFile(file: File) {
     const overall = computeOverall(stats);
     const tier = computeTier(overall);
     const { position, archetype } = computeArchetype(stats);
+    const country = countryInput.value.trim().toUpperCase();
+    const flag = await loadFlagGraphic(country);
 
     renderAndShow({
       name: `${profile.firstName} ${profile.lastName}`.trim() || "Unknown",
       headline: profile.headline,
-      country: countryInput.value.trim().toUpperCase(),
+      company: profile.company,
+      country,
+      flag,
       stats,
       overall,
       tier,
@@ -183,11 +188,15 @@ async function handlePdfFile(file: File) {
     const overall = computeOverall(stats);
     const tier = computeTier(overall);
     const { position, archetype } = computeArchetype(stats);
+    const country = countryInput.value.trim().toUpperCase();
+    const flag = await loadFlagGraphic(country);
 
     renderAndShow({
       name: profile.name || "Unknown",
       headline: profile.headline,
-      country: countryInput.value.trim().toUpperCase(),
+      company: profile.company,
+      country,
+      flag,
       stats,
       overall,
       tier,

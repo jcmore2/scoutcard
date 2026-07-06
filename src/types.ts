@@ -2,6 +2,7 @@ export interface ParsedProfile {
   firstName: string;
   lastName: string;
   headline: string;
+  company: string; // most recent/current employer, from Positions.csv
   positionYears: number; // total years spanned across Positions.csv
   skillCount: number; // unique entries in Skills.csv
   connectionCount: number; // rows in Connections.csv
@@ -20,12 +21,20 @@ export interface ParsedProfile {
 export interface PdfProfile {
   name: string;
   headline: string;
+  company: string; // most recent/current employer, first entry in the Experience section
   positionYears: number; // career span, earliest role start to latest end/present
   roleCount: number; // number of distinct positions listed
   certCount: number;
   languageCount: number;
   topSkillCount: number; // LinkedIn's PDF only lists up to 3 — capped by design
   educationCount: number;
+}
+
+// A country flag graphic extracted from a bundled SVG, ready to embed as a
+// nested <svg viewBox="{viewBox}">{inner}</svg> inside a card.
+export interface FlagGraphic {
+  viewBox: string;
+  inner: string;
 }
 
 export interface Stats {
@@ -44,7 +53,9 @@ export type CardStyle = "fut" | "tcg";
 export interface CardData {
   name: string;
   headline: string;
+  company: string;
   country: string;
+  flag: FlagGraphic | null;
   stats: Stats;
   overall: number;
   tier: Tier;

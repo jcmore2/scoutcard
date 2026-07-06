@@ -1,3 +1,5 @@
+import type { FlagGraphic } from "./types.js";
+
 export function escapeXml(s: string): string {
   return s.replace(/[<>&'"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[c]!);
 }
@@ -36,4 +38,21 @@ export function nameFontSize(longestLine: number): number {
 
 export function truncate(s: string, max: number): string {
   return s.length > max ? `${s.slice(0, max - 1)}…` : s;
+}
+
+// Renders a bundled flag SVG (see src/flag.ts) as a nested <svg> at a given
+// position, or "" if there's no flag to show — callers just splice this
+// into their template regardless of whether a flag was resolved.
+export function flagFragment(
+  flag: FlagGraphic | null,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  borderColor: string,
+): string {
+  if (!flag) return "";
+  return `
+    <rect x="${x - 1}" y="${y - 1}" width="${width + 2}" height="${height + 2}" fill="none" stroke="${borderColor}" stroke-opacity="0.4" stroke-width="1" />
+    <svg x="${x}" y="${y}" width="${width}" height="${height}" viewBox="${flag.viewBox}" preserveAspectRatio="xMidYMid slice">${flag.inner}</svg>`;
 }

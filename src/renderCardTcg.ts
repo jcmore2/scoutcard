@@ -1,7 +1,7 @@
 import type { CardData, Stats } from "./types.js";
 import { tierColors } from "./scoring.js";
 import { STAT_DESCRIPTIONS } from "./statDescriptions.js";
-import { escapeXml, initials, wrapName, nameFontSize, truncate } from "./cardTextUtils.js";
+import { escapeXml, initials, wrapName, nameFontSize, truncate, flagFragment } from "./cardTextUtils.js";
 
 const STAT_ORDER: (keyof Stats)[] = ["pac", "sho", "pas", "dri", "def", "phy"];
 
@@ -25,6 +25,11 @@ export function renderCardTcg(data: CardData): string {
   const descriptions = STAT_DESCRIPTIONS[data.mode];
   const modeLabel = data.mode === "SCOUT" ? "PDF Scout" : "Full Export";
   const weakest = lowestStat(data.stats);
+
+  const headlineMentionsCompany = data.company && data.headline.toLowerCase().includes(data.company.toLowerCase());
+  const headlineCaption = data.company && !headlineMentionsCompany
+    ? `${truncate(data.headline, 40)} · ${data.company}`
+    : truncate(data.headline, 58);
 
   const nameLines = wrapName(data.name.toUpperCase(), 20).map(escapeXml);
   const twoLines = nameLines.length > 1;
@@ -93,6 +98,7 @@ export function renderCardTcg(data: CardData): string {
 
   <rect x="21" y="${badgeY}" width="72" height="14" rx="7" fill="${colors.from}" />
   <text x="57" y="${badgeY + 10}" font-size="8" font-weight="800" fill="${colors.text}" text-anchor="middle">${data.tier}</text>
+  ${flagFragment(data.flag, 99, badgeY, 18, 14, INK)}
   <text x="319" y="${badgeY + 10}" font-size="8" font-weight="600" fill="${MUTED_INK}" text-anchor="end" font-style="italic">Sourced via ${modeLabel}</text>
 
   ${nameLines
@@ -105,7 +111,7 @@ export function renderCardTcg(data: CardData): string {
   <text x="272" y="${hpY}" font-size="9" font-weight="800" fill="${INK}" text-anchor="end">HP</text>
   <text x="319" y="${hpY}" font-size="18" font-weight="800" fill="${INK}" text-anchor="end">${data.overall}</text>
 
-  <text x="21" y="${headlineY}" font-size="8" fill="${MUTED_INK}" font-style="italic">${escapeXml(truncate(data.headline, 58))}</text>
+  <text x="21" y="${headlineY}" font-size="8" fill="${MUTED_INK}" font-style="italic">${escapeXml(headlineCaption)}</text>
 
   <rect x="21" y="${artY}" width="298" height="${artHeight}" rx="8" fill="url(#tcgArt)" stroke="${INK}" stroke-opacity="0.2" />
   <circle cx="170" cy="${artY + artHeight / 2}" r="42" fill="#ffffff" fill-opacity="0.3" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.4" />

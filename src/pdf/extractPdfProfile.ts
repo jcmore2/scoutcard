@@ -44,7 +44,7 @@ function countSidebarSection(lines: PdfLine[], headers: string[], boundary: numb
 
 export function extractPdfProfile(lines: PdfLine[]): PdfProfile {
   if (lines.length === 0) {
-    return { name: "", headline: "", positionYears: 0, roleCount: 0, certCount: 0, languageCount: 0, topSkillCount: 0, educationCount: 0 };
+    return { name: "", headline: "", company: "", positionYears: 0, roleCount: 0, certCount: 0, languageCount: 0, topSkillCount: 0, educationCount: 0 };
   }
 
   // The name is reliably the single largest-font run on the page — true
@@ -63,6 +63,12 @@ export function extractPdfProfile(lines: PdfLine[]): PdfProfile {
   const educationStart = findHeaderIndex(lines, EDUCATION_HEADERS);
   const experienceEnd = educationStart === -1 ? lines.length : educationStart;
   const experienceLines = experienceStart === -1 ? [] : lines.slice(experienceStart + 1, experienceEnd);
+
+  // LinkedIn lists experience newest-first, and each entry's block starts
+  // with the company name (before any per-role title/date line) — so the
+  // very first experience line is the current/most recent employer.
+  const company =
+    experienceLines.length > 0 && !DATE_RANGE_LINE.test(experienceLines[0].text) ? experienceLines[0].text : "";
 
   let roleCount = 0;
   let earliestYear: number | null = null;
@@ -89,6 +95,7 @@ export function extractPdfProfile(lines: PdfLine[]): PdfProfile {
   return {
     name,
     headline,
+    company,
     positionYears,
     roleCount,
     certCount,

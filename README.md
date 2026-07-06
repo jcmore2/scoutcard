@@ -72,6 +72,22 @@ from the already-computed data — no re-upload needed. Both are original
 layouts inspired by those card formats, not any officially licensed card
 set, and say so on the card itself.
 
+## Flag and company, but no photo or logo
+
+The card shows a real country flag (if you enter a country code) and your
+current employer's name, extracted from whichever source you used. Flags are
+bundled locally ([web/public/flags](web/public/flags), from the
+[flag-icons](https://github.com/lipis/flag-icons) project) and fetched from
+this site itself — never a third-party request.
+
+There's deliberately no profile photo or company logo. Neither the data
+export nor the "Save to PDF" export contains an image (verified directly —
+scanning a real "Save to PDF" file's embedded objects turns up zero images),
+and the only way to get a real logo would be guessing a company's domain and
+fetching it from a third-party logo API, which would leak the company name
+over the network — a real conflict with "nothing ever leaves your browser."
+The initials avatar placeholder stays as-is.
+
 ## CLI (generates a card you commit to this repo)
 
 **Full export:**
