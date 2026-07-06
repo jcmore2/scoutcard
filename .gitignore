@@ -1,0 +1,10 @@
+node_modules/
+dist/
+
+# Real LinkedIn export archives contain other people's personal data
+# (connections' names, companies, endorsers, etc). Never commit these.
+*.zip
+!sample/sample-export.zip
+
+# Where you're expected to drop your own real export locally.
+/private/
