@@ -1,6 +1,6 @@
 import type { CardData } from "./types.js";
 import { tierColors } from "./scoring.js";
-import { escapeXml, initials, truncate } from "./cardTextUtils.js";
+import { escapeXml, initials, truncate, flagFragment } from "./cardTextUtils.js";
 
 const STAT_LABELS: [key: keyof CardData["stats"], label: string][] = [
   ["pac", "PAC"],
@@ -70,9 +70,16 @@ export function renderCard(data: CardData): string {
     <text x="26" y="72" font-size="46" font-weight="800" fill="${colors.text}" font-family="'Arial Black', Arial, sans-serif">${data.overall}</text>
     <text x="26" y="96" font-size="15" font-weight="700" fill="${colors.text}" opacity="0.9">${escapeXml(data.position)}</text>
 
-    <text x="312" y="34" font-size="12" font-weight="700" fill="${colors.text}" opacity="0.75" text-anchor="end">${escapeXml(data.country)}</text>
-    <text x="312" y="50" font-size="11" font-weight="800" fill="${colors.text}" opacity="0.85" text-anchor="end">${data.tier}</text>
-    <text x="312" y="64" font-size="8" font-weight="700" fill="${colors.text}" opacity="0.55" text-anchor="end">${data.mode === "SCOUT" ? "PDF SCOUT" : "FULL EXPORT"}</text>
+    ${flagFragment(data.flag, 26, 110, 32, 24, colors.text)}
+    ${
+      data.company
+        ? `<rect x="24" y="140" width="118" height="19" rx="4" fill="${colors.text}" fill-opacity="0.16" />
+    <text x="30" y="153" font-size="9.5" font-weight="700" fill="${colors.text}">${escapeXml(truncate(data.company, 16))}</text>`
+        : ""
+    }
+
+    <text x="312" y="34" font-size="12" font-weight="800" fill="${colors.text}" opacity="0.85" text-anchor="end">${data.tier}</text>
+    <text x="312" y="48" font-size="8" font-weight="700" fill="${colors.text}" opacity="0.55" text-anchor="end">${data.mode === "SCOUT" ? "PDF SCOUT" : "FULL EXPORT"}</text>
 
     <circle cx="170" cy="172" r="64" fill="#ffffff" fill-opacity="0.22" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.45" />
     <text x="170" y="187" font-size="46" font-weight="800" fill="${colors.text}" text-anchor="middle">${escapeXml(initials(data.name))}</text>

@@ -25,9 +25,22 @@
     <text x="26" y="72" font-size="46" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif">41</text>
     <text x="26" y="96" font-size="15" font-weight="700" fill="#2A1A0C" opacity="0.9">CDM</text>
 
-    <text x="312" y="34" font-size="12" font-weight="700" fill="#2A1A0C" opacity="0.75" text-anchor="end">US</text>
-    <text x="312" y="50" font-size="11" font-weight="800" fill="#2A1A0C" opacity="0.85" text-anchor="end">BRONZE</text>
-    <text x="312" y="64" font-size="8" font-weight="700" fill="#2A1A0C" opacity="0.55" text-anchor="end">FULL EXPORT</text>
+    
+    <rect x="25" y="109" width="34" height="26" fill="none" stroke="#2A1A0C" stroke-opacity="0.4" stroke-width="1" />
+    <svg x="26" y="110" width="32" height="24" viewBox="0 0 640 480" preserveAspectRatio="xMidYMid slice">
+  <path fill="#bd3d44" d="M0 0h640v480H0"/>
+  <path stroke="#fff" stroke-width="37" d="M0 55.3h640M0 129h640M0 203h640M0 277h640M0 351h640M0 425h640"/>
+  <path fill="#192f5d" d="M0 0h364.8v258.5H0"/>
+  <marker markerHeight="30" markerWidth="30">
+    <path fill="#fff" d="m14 0 9 27L0 10h28L5 27z"/>
+  </marker>
+  <path fill="none" marker-mid="url(#us-a)" d="m0 0 16 11h61 61 61 61 60L47 37h61 61 60 61L16 63h61 61 61 61 60L47 89h61 61 60 61L16 115h61 61 61 61 60L47 141h61 61 60 61L16 166h61 61 61 61 60L47 192h61 61 60 61L16 218h61 61 61 61 60z"/>
+</svg>
+    <rect x="24" y="140" width="118" height="19" rx="4" fill="#2A1A0C" fill-opacity="0.16" />
+    <text x="30" y="153" font-size="9.5" font-weight="700" fill="#2A1A0C">Acme Corp</text>
+
+    <text x="312" y="34" font-size="12" font-weight="800" fill="#2A1A0C" opacity="0.85" text-anchor="end">BRONZE</text>
+    <text x="312" y="48" font-size="8" font-weight="700" fill="#2A1A0C" opacity="0.55" text-anchor="end">FULL EXPORT</text>
 
     <circle cx="170" cy="172" r="64" fill="#ffffff" fill-opacity="0.22" stroke="#2A1A0C" stroke-width="2" stroke-opacity="0.45" />
     <text x="170" y="187" font-size="46" font-weight="800" fill="#2A1A0C" text-anchor="middle">JS</text>

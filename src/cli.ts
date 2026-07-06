@@ -5,6 +5,7 @@ import { computeStats, computeOverall, computeTier, computeArchetype } from "./s
 import { computeStatsFromPdfProfile } from "./pdf/scoringPdf.js";
 import { parseProfilePdf } from "./pdf/readPdfNode.js";
 import { renderCardStyled } from "./renderCardStyled.js";
+import { loadFlagGraphic } from "./flagNode.js";
 import type { CardData, CardStyle } from "./types.js";
 
 function parseArgs(argv: string[]): Record<string, string> {
@@ -23,6 +24,7 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
   const country = args.country ?? "";
   const outPath = args.out ?? "output/card.svg";
+  const flag = loadFlagGraphic(country);
 
   let cardData: CardData;
 
@@ -35,7 +37,9 @@ async function main() {
     cardData = {
       name: profile.name || "Unknown",
       headline: profile.headline,
+      company: profile.company,
       country,
+      flag,
       stats,
       overall,
       tier,
@@ -52,7 +56,9 @@ async function main() {
     cardData = {
       name: `${profile.firstName} ${profile.lastName}`.trim() || "Unknown",
       headline: profile.headline,
+      company: profile.company,
       country,
+      flag,
       stats,
       overall,
       tier,
