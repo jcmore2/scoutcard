@@ -14,8 +14,10 @@ const STAT_LABELS: [key: keyof CardData["stats"], label: string][] = [
 // A shield/pentagon silhouette (flat wide top, straight sides, tapering to
 // a point at the bottom) rather than a plain rounded rectangle — the shape
 // sports-card-style ratings cards use. The taper only kicks in near the
-// bottom so the stat grid still gets the full card width.
-const SHIELD_PATH =
+// bottom so the stat grid still gets the full card width. Exported so the
+// interactive card-back view (web/cardBack.ts) can clip to the identical
+// shape instead of drifting into a plain rectangle.
+export const SHIELD_PATH =
   "M 34 6 L 306 6 Q 334 6 334 34 L 334 396 Q 334 414 320 424 L 316 428 L 194 468 Q 170 480 146 468 L 24 428 L 20 424 Q 6 414 6 396 L 6 34 Q 6 6 34 6 Z";
 
 // Real names never wrap to 2 lines on this style — the font auto-shrinks to
@@ -62,11 +64,17 @@ export function renderCard(data: CardData): string {
     </clipPath>
   </defs>
 
-  <path d="${SHIELD_PATH}" fill="url(#cardBg)" stroke="${colors.text}" stroke-opacity="0.35" stroke-width="2" />
+  <path d="${SHIELD_PATH}" fill="url(#cardBg)" stroke="${colors.text}" stroke-opacity="0.4" stroke-width="3" />
+  <path d="${SHIELD_PATH}" fill="none" stroke="${colors.text}" stroke-opacity="0.25" stroke-width="1" transform="translate(170 240) scale(0.965) translate(-170 -240)" />
   <path d="${SHIELD_PATH}" fill="url(#cardTexture)" />
   <path d="${SHIELD_PATH}" fill="url(#cardSheen)" />
 
   <g clip-path="url(#shieldClip)">
+    <text x="170" y="270" font-size="240" font-weight="800" fill="${colors.text}" fill-opacity="0.08" text-anchor="middle" font-family="'Arial Black', Arial, sans-serif">${data.overall}</text>
+
+    <rect x="158" y="10" width="15" height="15" transform="rotate(45 170 22)" fill="${colors.from}" stroke="${colors.text}" stroke-opacity="0.5" stroke-width="1" />
+    <rect x="161.5" y="13.5" width="8" height="8" transform="rotate(45 170 22)" fill="none" stroke="${colors.text}" stroke-opacity="0.5" stroke-width="0.75" />
+
     <text x="26" y="72" font-size="46" font-weight="800" fill="${colors.text}" font-family="'Arial Black', Arial, sans-serif">${data.overall}</text>
     <text x="26" y="96" font-size="15" font-weight="700" fill="${colors.text}" opacity="0.9">${escapeXml(data.position)}</text>
 
@@ -81,14 +89,21 @@ export function renderCard(data: CardData): string {
     <text x="312" y="34" font-size="12" font-weight="800" fill="${colors.text}" opacity="0.85" text-anchor="end">${data.tier}</text>
     <text x="312" y="48" font-size="8" font-weight="700" fill="${colors.text}" opacity="0.55" text-anchor="end">${data.mode === "SCOUT" ? "PDF SCOUT" : "FULL EXPORT"}</text>
 
+    <circle cx="170" cy="172" r="66" fill="none" stroke="${colors.text}" stroke-opacity="0.25" stroke-width="1" />
     <circle cx="170" cy="172" r="64" fill="#ffffff" fill-opacity="0.22" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.45" />
     <text x="170" y="187" font-size="46" font-weight="800" fill="${colors.text}" text-anchor="middle">${escapeXml(initials(data.name))}</text>
 
     <rect x="6" y="266" width="328" height="34" fill="${colors.text}" fill-opacity="0.14" />
+    <line x1="6" y1="266" x2="334" y2="266" stroke="${colors.text}" stroke-opacity="0.3" stroke-width="1" />
+    <line x1="6" y1="300" x2="334" y2="300" stroke="${colors.text}" stroke-opacity="0.3" stroke-width="1" />
     <text x="170" y="289" font-size="${nameSize}" font-weight="800" fill="${colors.text}" text-anchor="middle" letter-spacing="0.5">${escapeXml(name)}</text>
 
     <text x="170" y="316" font-size="11" fill="${colors.text}" text-anchor="middle" opacity="0.8">${headline.length > 40 ? headline.slice(0, 37) + "…" : headline}</text>
     <text x="170" y="332" font-size="12" font-weight="700" fill="${colors.text}" text-anchor="middle" opacity="0.9">${escapeXml(data.archetype)}</text>
+
+    <line x1="170" y1="344" x2="170" y2="428" stroke="${colors.text}" stroke-opacity="0.25" stroke-width="1" />
+    <line x1="30" y1="375" x2="310" y2="375" stroke="${colors.text}" stroke-opacity="0.18" stroke-width="1" />
+    <line x1="30" y1="405" x2="310" y2="405" stroke="${colors.text}" stroke-opacity="0.18" stroke-width="1" />
 
     ${leftStats.map((s, i) => statRow(s, 42, 360 + i * 30)).join("\n")}
     ${rightStats.map((s, i) => statRow(s, 192, 360 + i * 30)).join("\n")}

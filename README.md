@@ -64,9 +64,13 @@ pack"** to scout another profile. Click "Download card.svg" to save the
 result and embed/commit it yourself.
 
 Tap the card to flip it and see what each stat is measuring and what the
-tier bands mean. This is a web-app-only feature — the embeddable `card.svg`
-file (front side only) is a static image, so it can't be interactive inside
-a GitHub README `<img>`.
+tier bands mean. The back matches whichever front style is active — same
+shield silhouette and gradient for FIFA/FUT, same gold border and parchment
+for the trading-card style ([web/cardBack.ts](web/cardBack.ts) reuses the
+exact shape/palette constants the fronts export, via an SVG `foreignObject`
+so the stat list can still be laid out with regular HTML/CSS). This is a
+web-app-only feature — the embeddable `card.svg` file (front side only) is a
+static image, so it can't be interactive inside a GitHub README `<img>`.
 
 There's also a **card style switcher**: the same scored data can render as a
 FIFA/FUT-style shield card, or as a trading-card-game-style layout

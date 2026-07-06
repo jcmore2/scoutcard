@@ -41,10 +41,11 @@ function setStatus(message: string, isError = false) {
 
 const SQUEEZE_MS = 160;
 
-function renderFront() {
+function renderFrontAndBack() {
   if (!currentCardData) return;
   currentSvg = renderCardStyled(currentCardData, currentStyle);
   cardFront.innerHTML = currentSvg;
+  cardBack.innerHTML = renderCardBack(currentCardData, currentStyle);
 }
 
 function setStyle(style: CardStyle) {
@@ -53,7 +54,7 @@ function setStyle(style: CardStyle) {
   styleTcgBtn.classList.toggle("active", style === "tcg");
   styleFutBtn.setAttribute("aria-selected", String(style === "fut"));
   styleTcgBtn.setAttribute("aria-selected", String(style === "tcg"));
-  renderFront();
+  renderFrontAndBack();
 }
 
 styleFutBtn.addEventListener("click", () => setStyle("fut"));
@@ -72,8 +73,7 @@ function triggerRevealAnimation() {
 
 function renderAndShow(cardData: CardData) {
   currentCardData = cardData;
-  renderFront();
-  cardBack.innerHTML = renderCardBack(cardData);
+  renderFrontAndBack();
   cardFront.hidden = false;
   cardBack.hidden = true;
   cardFlipInner.classList.remove("squeezed");
