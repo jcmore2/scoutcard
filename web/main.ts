@@ -5,7 +5,11 @@ import { computeStats, computeOverall, computeTier, computeArchetype } from "../
 import { computeStatsFromPdfProfile } from "../src/pdf/scoringPdf.js";
 import { renderCardStyled } from "../src/renderCardStyled.js";
 import { renderCardBack } from "./cardBack.js";
+import { initHeroShowcase } from "./heroShowcase.js";
 import type { CardData, CardStyle } from "../src/types.js";
+
+const heroShowcase = document.getElementById("hero-showcase") as HTMLDivElement;
+initHeroShowcase(heroShowcase);
 
 const setupPanel = document.getElementById("setup-panel") as HTMLElement;
 
