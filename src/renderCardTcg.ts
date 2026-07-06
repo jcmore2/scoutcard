@@ -5,10 +5,12 @@ import { escapeXml, initials, wrapName, nameFontSize, truncate, flagFragment } f
 
 const STAT_ORDER: (keyof Stats)[] = ["pac", "sho", "pas", "dri", "def", "phy"];
 
-const GOLD_BORDER = { from: "#F6D776", to: "#C99A2E" };
-const PAPER = "#FFF8E7";
-const INK = "#2A1F14";
-const MUTED_INK = "#6B5A3E";
+// Exported so the interactive card-back view (web/cardBack.ts) can reuse the
+// exact same palette/border instead of drifting into a different look.
+export const GOLD_BORDER = { from: "#F6D776", to: "#C99A2E" };
+export const PAPER = "#FFF8E7";
+export const INK = "#2A1F14";
+export const MUTED_INK = "#6B5A3E";
 
 function lowestStat(stats: Stats): keyof Stats {
   return STAT_ORDER.reduce((worst, key) => (stats[key] < stats[worst] ? key : worst), STAT_ORDER[0]);
@@ -74,8 +76,10 @@ export function renderCardTcg(data: CardData): string {
 
   const attackRow = (key: keyof Stats, i: number) => {
     const rowY = attackTop + i * rowHeight;
+    const dividerY = rowY + rowHeight - 6;
     return `
-    <circle cx="24" cy="${rowY - 4}" r="5" fill="${colors.from}" stroke="${INK}" stroke-opacity="0.3" />
+    ${i > 0 ? `<line x1="21" y1="${dividerY - rowHeight}" x2="319" y2="${dividerY - rowHeight}" stroke="#B79B5B" stroke-opacity="0.35" stroke-width="0.75" />` : ""}
+    <circle cx="24" cy="${rowY - 4}" r="5.5" fill="${colors.from}" stroke="${INK}" stroke-opacity="0.4" stroke-width="0.75" />
     <text x="35" y="${rowY}" font-size="11" font-weight="800" fill="${INK}">${key.toUpperCase()}</text>
     <text x="316" y="${rowY}" font-size="13" font-weight="800" fill="${INK}" text-anchor="end">${data.stats[key]}</text>
     <text x="35" y="${rowY + 10}" font-size="7.5" fill="${MUTED_INK}" font-style="italic">${escapeXml(truncate(descriptions[key], 58))}</text>`;
@@ -91,9 +95,17 @@ export function renderCardTcg(data: CardData): string {
       <stop offset="0" stop-color="${colors.from}" />
       <stop offset="1" stop-color="${colors.to}" />
     </linearGradient>
+    <linearGradient id="tcgShine" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0" />
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.55" />
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.55" />
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
   </defs>
 
   <rect x="4" y="4" width="332" height="472" rx="16" fill="url(#tcgBorder)" stroke="#8A6B1A" stroke-width="2" />
+  <rect x="4" y="4" width="332" height="472" rx="16" fill="url(#tcgShine)" />
+  <rect x="9" y="9" width="322" height="462" rx="13" fill="none" stroke="#8A6B1A" stroke-opacity="0.5" stroke-width="1" />
   <rect x="13" y="13" width="314" height="454" rx="11" fill="${PAPER}" />
 
   <rect x="21" y="${badgeY}" width="72" height="14" rx="7" fill="${colors.from}" />
@@ -107,12 +119,13 @@ export function renderCardTcg(data: CardData): string {
         `<text x="21" y="${i === 0 ? nameBaseline : nameBottom}" font-size="${nameSize}" font-weight="800" fill="${INK}">${line}</text>`,
     )
     .join("\n  ")}
-  <circle cx="248" cy="${hpY - 4}" r="5" fill="${colors.from}" stroke="${INK}" stroke-opacity="0.4" />
-  <text x="272" y="${hpY}" font-size="9" font-weight="800" fill="${INK}" text-anchor="end">HP</text>
-  <text x="319" y="${hpY}" font-size="18" font-weight="800" fill="${INK}" text-anchor="end">${data.overall}</text>
+  <circle cx="243" cy="${hpY - 5}" r="6" fill="${colors.from}" stroke="${INK}" stroke-opacity="0.5" stroke-width="0.75" />
+  <text x="270" y="${hpY}" font-size="11" font-weight="800" fill="${INK}" text-anchor="end">HP</text>
+  <text x="319" y="${hpY + 1}" font-size="22" font-weight="800" fill="${INK}" text-anchor="end">${data.overall}</text>
 
   <text x="21" y="${headlineY}" font-size="8" fill="${MUTED_INK}" font-style="italic">${escapeXml(headlineCaption)}</text>
 
+  <rect x="20" y="${artY - 1}" width="300" height="${artHeight + 2}" rx="9" fill="none" stroke="#8A6B1A" stroke-opacity="0.6" stroke-width="1.5" />
   <rect x="21" y="${artY}" width="298" height="${artHeight}" rx="8" fill="url(#tcgArt)" stroke="${INK}" stroke-opacity="0.2" />
   <circle cx="170" cy="${artY + artHeight / 2}" r="42" fill="#ffffff" fill-opacity="0.3" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.4" />
   <text x="170" y="${artY + artHeight / 2 + 9}" font-size="28" font-weight="800" fill="${colors.text}" text-anchor="middle">${escapeXml(initials(data.name))}</text>
@@ -137,6 +150,7 @@ export function renderCardTcg(data: CardData): string {
   <circle cx="300" cy="${footerValueY - 3}" r="5" fill="none" stroke="${INK}" stroke-width="1.2" />
   <circle cx="312" cy="${footerValueY - 3}" r="5" fill="none" stroke="${INK}" stroke-width="1.2" />
 
+  <path d="M 306 ${creditY - 4} l 1.8 3.8 4.2 0.5 -3 3 0.7 4.1 -3.7 -2 -3.7 2 0.7 -4.1 -3 -3 4.2 -0.5 z" fill="${colors.from}" stroke="${INK}" stroke-opacity="0.4" stroke-width="0.5" />
   <text x="170" y="${creditY}" font-size="7" fill="${MUTED_INK}" opacity="0.75" font-style="italic" text-anchor="middle">ScoutCard fan card — not affiliated with Pokémon or LinkedIn</text>
 </svg>`;
 }
