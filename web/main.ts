@@ -3,6 +3,7 @@ import { parseProfilePdfFile } from "./lib/parsePdfBrowser.js";
 import { computeStats, computeOverall, computeTier, computeArchetype } from "../src/scoring.js";
 import { computeStatsFromPdfProfile } from "../src/pdf/scoringPdf.js";
 import { renderCard } from "../src/renderCard.js";
+import { renderCardBack } from "./cardBack.js";
 import type { CardData } from "../src/types.js";
 
 const tabFull = document.getElementById("tab-full") as HTMLButtonElement;
@@ -21,7 +22,10 @@ const pdfInput = document.getElementById("pdf-input") as HTMLInputElement;
 const countryInput = document.getElementById("country-input") as HTMLInputElement;
 const statusEl = document.getElementById("status") as HTMLParagraphElement;
 const resultEl = document.getElementById("result") as HTMLElement;
-const cardContainer = document.getElementById("card-container") as HTMLDivElement;
+const cardFlip = document.getElementById("card-flip") as HTMLDivElement;
+const cardFlipInner = document.getElementById("card-flip-inner") as HTMLDivElement;
+const cardFront = document.getElementById("card-front") as HTMLDivElement;
+const cardBack = document.getElementById("card-back") as HTMLDivElement;
 const downloadBtn = document.getElementById("download-btn") as HTMLButtonElement;
 
 let currentSvg = "";
@@ -46,12 +50,36 @@ function switchTab(mode: "full" | "scout") {
 tabFull.addEventListener("click", () => switchTab("full"));
 tabScout.addEventListener("click", () => switchTab("scout"));
 
+const SQUEEZE_MS = 160;
+
 function renderAndShow(cardData: CardData) {
   currentSvg = renderCard(cardData);
-  cardContainer.innerHTML = currentSvg;
+  cardFront.innerHTML = currentSvg;
+  cardBack.innerHTML = renderCardBack(cardData);
+  cardFront.hidden = false;
+  cardBack.hidden = true;
+  cardFlipInner.classList.remove("squeezed");
   resultEl.hidden = false;
   setStatus(`Scouted ${cardData.name || "your profile"} — overall ${cardData.overall}, ${cardData.tier} (${cardData.mode}).`);
 }
+
+function toggleFlip() {
+  cardFlipInner.classList.add("squeezed");
+  window.setTimeout(() => {
+    const showingFront = !cardFront.hidden;
+    cardFront.hidden = showingFront;
+    cardBack.hidden = !showingFront;
+    cardFlipInner.classList.remove("squeezed");
+  }, SQUEEZE_MS);
+}
+
+cardFlip.addEventListener("click", toggleFlip);
+cardFlip.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    toggleFlip();
+  }
+});
 
 async function handleZipFile(file: File) {
   if (!file.name.toLowerCase().endsWith(".zip")) {

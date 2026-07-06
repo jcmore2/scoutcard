@@ -56,6 +56,11 @@ client-side with JavaScript — nothing is ever uploaded anywhere, not even to
 this project. Close the tab and the data is gone. Click "Download card.svg"
 to save the result and embed/commit it yourself.
 
+Tap the card to flip it and see what each stat is measuring and what the
+tier bands mean. This is a web-app-only feature — the embeddable `card.svg`
+file (front side only) is a static image, so it can't be interactive inside
+a GitHub README `<img>`.
+
 ## CLI (generates a card you commit to this repo)
 
 **Full export:**

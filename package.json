@@ -8,8 +8,8 @@
     "generate": "tsx src/cli.ts",
     "build:sample": "tsx scripts/build-sample.ts",
     "generate:sample": "tsx src/cli.ts --export sample/sample-export.zip --country US --out sample/sample-card.svg",
-    "dev:web": "vite web",
-    "build:web": "vite build web --outDir dist --emptyOutDir"
+    "dev:web": "vite web --config vite.config.ts",
+    "build:web": "vite build web --config vite.config.ts --outDir dist --emptyOutDir"
   },
   "dependencies": {
     "adm-zip": "^0.5.16",

@@ -74,7 +74,13 @@
       <p id="status" role="status"></p>
 
       <section id="result" hidden>
-        <div id="card-container"></div>
+        <div id="card-flip" class="card-flip" role="button" tabindex="0" aria-label="Flip card to see what the score means">
+          <div class="card-flip-inner" id="card-flip-inner">
+            <div class="card-face card-front" id="card-front"></div>
+            <div class="card-face card-back" id="card-back" hidden></div>
+          </div>
+        </div>
+        <p class="flip-hint">Tap the card to see what the score means</p>
         <button id="download-btn">Download card.svg</button>
       </section>
 

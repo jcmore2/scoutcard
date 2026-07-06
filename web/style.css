@@ -165,10 +165,123 @@ section {
   gap: 16px;
 }
 
-#card-container svg {
+.card-flip {
   width: 320px;
-  height: auto;
+  height: 452px; /* 320 * (480/340) — matches the card SVG's viewBox aspect ratio */
+  cursor: pointer;
+}
+
+/* A squeeze-and-swap flip (scaleX to 0, swap which face is shown, scale back
+   to 1) rather than a true 3D rotateY + backface-visibility flip — the
+   latter renders inconsistently across engines (the "hidden" face can still
+   show through), where this degrades to nothing worse than a quick scale
+   animation everywhere. */
+.card-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.16s ease;
   filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.4));
+}
+
+.card-flip-inner.squeezed {
+  transform: scaleX(0);
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.card-face[hidden] {
+  display: none;
+}
+
+.card-face svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.back-face {
+  width: 100%;
+  height: 100%;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: Arial, sans-serif;
+}
+
+.back-title {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.back-mode {
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.75;
+  margin-top: -6px;
+}
+
+.back-tiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  font-size: 9px;
+  font-weight: 700;
+  opacity: 0.65;
+}
+
+.back-tier.current {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.back-stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+}
+
+.back-stats li {
+  display: flex;
+  flex-direction: column;
+}
+
+.back-stat-key {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.back-stat-desc {
+  font-size: 10.5px;
+  opacity: 0.85;
+}
+
+.back-note {
+  font-size: 9px;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.back-hint {
+  font-size: 9px;
+  opacity: 0.55;
+  text-align: center;
+}
+
+.flip-hint {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: -4px 0 0;
 }
 
 button {
