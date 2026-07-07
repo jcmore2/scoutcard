@@ -1,6 +1,6 @@
 import { tierColors } from "../src/scoring.js";
 import { SHIELD_PATH } from "../src/renderCard.js";
-import { GOLD_BORDER, PAPER, INK } from "../src/renderCardTcg.js";
+import { GOLD_BORDER, BORDER_EDGE, PAPER, INK, TCG_FONT } from "../src/renderCardTcg.js";
 import { STAT_DESCRIPTIONS, TIER_BANDS } from "../src/statDescriptions.js";
 import type { CardData, CardStyle, Stats } from "../src/types.js";
 
@@ -57,7 +57,8 @@ function renderFutBack(data: CardData): string {
 </svg>`;
 }
 
-// Matches the TCG front's gold border, parchment fill, and serif type.
+// Matches the TCG front's yellow border, parchment fill, and rounded
+// sans-serif type.
 function renderTcgBack(data: CardData): string {
   return `<svg viewBox="0 0 340 480" xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <defs>
@@ -66,10 +67,10 @@ function renderTcgBack(data: CardData): string {
       <stop offset="1" stop-color="${GOLD_BORDER.to}" />
     </linearGradient>
   </defs>
-  <rect x="4" y="4" width="332" height="472" rx="16" fill="url(#backBorder)" stroke="#8A6B1A" stroke-width="2" />
+  <rect x="4" y="4" width="332" height="472" rx="16" fill="url(#backBorder)" stroke="${BORDER_EDGE}" stroke-width="2.5" />
   <rect x="13" y="13" width="314" height="454" rx="11" fill="${PAPER}" />
   <foreignObject x="13" y="13" width="314" height="454">
-    <xhtml:div class="back-face" style="color: ${INK}; font-family: Georgia, 'Times New Roman', serif; padding: 22px 22px 18px;">
+    <xhtml:div class="back-face" style="color: ${INK}; font-family: ${TCG_FONT}; padding: 22px 22px 18px;">
       ${backContentHtml(data)}
     </xhtml:div>
   </foreignObject>
