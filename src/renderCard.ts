@@ -90,8 +90,14 @@ export function renderCard(data: CardData): string {
     <text x="312" y="48" font-size="8" font-weight="700" fill="${colors.text}" opacity="0.55" text-anchor="end">${data.mode === "SCOUT" ? "PDF SCOUT" : "FULL EXPORT"}</text>
 
     <circle cx="170" cy="172" r="66" fill="none" stroke="${colors.text}" stroke-opacity="0.25" stroke-width="1" />
-    <circle cx="170" cy="172" r="64" fill="#ffffff" fill-opacity="0.22" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.45" />
-    <text x="170" y="187" font-size="46" font-weight="800" fill="${colors.text}" text-anchor="middle">${escapeXml(initials(data.name))}</text>
+    ${
+      data.photo
+        ? `<clipPath id="avatarClip"><circle cx="170" cy="172" r="64" /></clipPath>
+    <image href="${data.photo}" x="106" y="108" width="128" height="128" clip-path="url(#avatarClip)" preserveAspectRatio="xMidYMid slice" />
+    <circle cx="170" cy="172" r="64" fill="none" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.45" />`
+        : `<circle cx="170" cy="172" r="64" fill="#ffffff" fill-opacity="0.22" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.45" />
+    <text x="170" y="187" font-size="46" font-weight="800" fill="${colors.text}" text-anchor="middle">${escapeXml(initials(data.name))}</text>`
+    }
 
     <rect x="6" y="266" width="328" height="34" fill="${colors.text}" fill-opacity="0.14" />
     <line x1="6" y1="266" x2="334" y2="266" stroke="${colors.text}" stroke-opacity="0.3" stroke-width="1" />

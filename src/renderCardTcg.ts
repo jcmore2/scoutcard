@@ -147,9 +147,14 @@ export function renderCardTcg(data: CardData): string {
   <text x="21" y="${headlineY}" font-size="8.5" fill="${MUTED_INK}" font-style="italic">${escapeXml(headlineCaption)}</text>
 
   <rect x="20" y="${artY - 1}" width="300" height="${artHeight + 2}" rx="9" fill="none" stroke="${BORDER_EDGE}" stroke-opacity="0.7" stroke-width="1.5" />
-  <rect x="21" y="${artY}" width="298" height="${artHeight}" rx="8" fill="url(#tcgArt)" stroke="${INK}" stroke-opacity="0.2" />
+  ${
+    data.photo
+      ? `<clipPath id="tcgArtClip"><rect x="21" y="${artY}" width="298" height="${artHeight}" rx="8" /></clipPath>
+  <image href="${data.photo}" x="21" y="${artY}" width="298" height="${artHeight}" clip-path="url(#tcgArtClip)" preserveAspectRatio="xMidYMid slice" />`
+      : `<rect x="21" y="${artY}" width="298" height="${artHeight}" rx="8" fill="url(#tcgArt)" stroke="${INK}" stroke-opacity="0.2" />
   <circle cx="170" cy="${artY + artHeight / 2}" r="42" fill="#ffffff" fill-opacity="0.3" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.4" />
-  <text x="170" y="${artY + artHeight / 2 + 9}" font-size="28" font-weight="800" fill="${colors.text}" text-anchor="middle">${escapeXml(initials(data.name))}</text>
+  <text x="170" y="${artY + artHeight / 2 + 9}" font-size="28" font-weight="800" fill="${colors.text}" text-anchor="middle">${escapeXml(initials(data.name))}</text>`
+  }
 
   <rect x="21" y="${powerBoxY}" width="298" height="${powerBoxHeight}" rx="6" fill="none" stroke="#B79B5B" stroke-width="1" />
   <text x="28" y="${powerBoxY + 14}" font-size="11" font-weight="800" fill="#7A4B9C">Scout Power: ${escapeXml(data.archetype)}</text>

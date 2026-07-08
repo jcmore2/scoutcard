@@ -85,6 +85,14 @@
         </div>
         <p class="flip-hint">Tap the card to see what the score means</p>
 
+        <div class="photo-uploader">
+          <label for="photo-input" id="photo-drop-zone" class="drop-zone drop-zone-compact">
+            <span id="photo-drop-label">Add a photo (optional) — drop an image here, or tap to choose</span>
+            <input id="photo-input" type="file" accept="image/*" />
+          </label>
+          <button id="remove-photo-btn" class="link-btn" hidden>Remove photo</button>
+        </div>
+
         <div class="actions">
           <button id="download-btn">Download card.svg</button>
           <button id="new-card-btn" class="secondary">Open a new pack</button>

@@ -30,6 +30,7 @@ async function buildDemoCard(): Promise<CardData> {
     position,
     archetype,
     mode: "FULL",
+    photo: null,
   };
 }
 

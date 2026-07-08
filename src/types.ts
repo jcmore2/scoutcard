@@ -67,4 +67,8 @@ export interface CardData {
   position: string;
   archetype: string;
   mode: SourceMode;
+  // A user-supplied photo (data URI), web-app-only and optional — the CLI
+  // and hero showcase always pass null. Never derived from LinkedIn data
+  // (see README's "Flag and company, but no photo or logo").
+  photo: string | null;
 }

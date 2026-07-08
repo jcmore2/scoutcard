@@ -47,6 +47,7 @@ async function main() {
       position,
       archetype,
       mode: "SCOUT",
+      photo: null,
     };
   } else if (args.export) {
     const profile = parseExport(args.export);
@@ -68,6 +69,7 @@ async function main() {
       position,
       archetype,
       mode: "FULL",
+      photo: null,
     };
   } else {
     console.error(

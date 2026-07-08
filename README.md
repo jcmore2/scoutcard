@@ -88,7 +88,7 @@ to this project. Close the tab and the data is gone.
   **"Open a new pack"** to scout another profile, or **"Download card.svg"**
   to keep the result.
 
-## Flag and company, but no photo or logo
+## Flag and company, no auto-extracted photo or logo
 
 The card shows a real country flag and current employer name, both
 extracted straight from the profile — no manual input. The flag comes from
@@ -101,12 +101,18 @@ bundled locally ([web/public/flags](web/public/flags), from the
 [flag-icons](https://github.com/lipis/flag-icons) project) and served from
 this site itself — never a third-party request.
 
-There's deliberately no profile photo or company logo. Neither the data
-export nor the "Save to PDF" export contains an image, and the only way to
-get a real logo would be guessing a company's domain and fetching it from a
-third-party logo API — leaking the company name over the network, which
-conflicts with "nothing ever leaves your browser." The initials avatar
-placeholder stays as-is.
+There's deliberately no company logo — the only way to get a real one would
+be guessing a company's domain and fetching it from a third-party logo API,
+leaking the company name over the network, which conflicts with "nothing
+ever leaves your browser."
+
+Neither the data export nor the "Save to PDF" export contains a photo
+either, so the web app lets you optionally drop one in after the card is
+generated — processed and embedded locally like everything else, never
+uploaded anywhere. It swaps out the initials-avatar placeholder wherever
+that appears (the FUT shield's circle, the TCG art panel, the baseball
+card's full photo panel) across all three styles and whichever style you
+switch to afterward. Skip it and the initials avatar stays.
 
 The card back links to the profile's own `linkedin.com/in/...` URL when the
 PDF export includes one — a plain link rather than a QR code, to avoid a

@@ -1,6 +1,7 @@
 import { parseProfilePdfFile } from "./lib/parsePdfBrowser.js";
 import { loadFlagGraphic } from "./lib/flagSvgBrowser.js";
 import { svgToPngBlob } from "./lib/svgToPng.js";
+import { fileToSquareDataUrl } from "./lib/imageToDataUrl.js";
 import { computeOverall, computeTier, computeArchetype } from "../src/scoring.js";
 import { computeStatsFromPdfProfile } from "../src/pdf/scoringPdf.js";
 import { guessCountryCode } from "../src/country.js";
@@ -20,6 +21,12 @@ const pdfDropZone = document.getElementById("pdf-drop-zone") as HTMLLabelElement
 const pdfDropLabel = document.getElementById("pdf-drop-label") as HTMLSpanElement;
 const pdfInput = document.getElementById("pdf-input") as HTMLInputElement;
 const PDF_DROP_DEFAULT = pdfDropLabel.textContent ?? "";
+
+const photoDropZone = document.getElementById("photo-drop-zone") as HTMLLabelElement;
+const photoDropLabel = document.getElementById("photo-drop-label") as HTMLSpanElement;
+const photoInput = document.getElementById("photo-input") as HTMLInputElement;
+const removePhotoBtn = document.getElementById("remove-photo-btn") as HTMLButtonElement;
+const PHOTO_DROP_DEFAULT = photoDropLabel.textContent ?? "";
 
 const styleFutBtn = document.getElementById("style-fut") as HTMLButtonElement;
 const styleTcgBtn = document.getElementById("style-tcg") as HTMLButtonElement;
@@ -129,12 +136,19 @@ function renderAndShow(cardData: CardData) {
   setStatus(`Scouted ${cardData.name || "your profile"} — overall ${cardData.overall}, ${cardData.tier} (${cardData.mode}).`);
 }
 
+function resetPhotoUploader() {
+  photoInput.value = "";
+  photoDropLabel.textContent = PHOTO_DROP_DEFAULT;
+  removePhotoBtn.hidden = true;
+}
+
 function resetToSetup() {
   resultEl.hidden = true;
   setupPanel.hidden = false;
   currentCardData = null;
   pdfInput.value = "";
   pdfDropLabel.textContent = PDF_DROP_DEFAULT;
+  resetPhotoUploader();
   setStatus("");
 }
 
@@ -190,6 +204,7 @@ async function handlePdfFile(file: File) {
       position,
       archetype,
       mode: "SCOUT",
+      photo: null,
     });
   } catch (err) {
     console.error(err);
@@ -221,6 +236,38 @@ function wireDropZone(zone: HTMLLabelElement, input: HTMLInputElement, handler: 
 }
 
 wireDropZone(pdfDropZone, pdfInput, handlePdfFile);
+
+// Purely cosmetic and entirely optional — LinkedIn data never includes a
+// photo (see README's "Flag and company, but no photo or logo"), so this is
+// the only way a card gets one, and only ever from a file the user picks
+// themselves, processed locally like everything else here.
+async function handlePhotoFile(file: File) {
+  if (!file.type.startsWith("image/")) {
+    setStatus("That doesn't look like an image file.", true);
+    return;
+  }
+  if (!currentCardData) return;
+
+  try {
+    const dataUrl = await fileToSquareDataUrl(file);
+    currentCardData.photo = dataUrl;
+    photoDropLabel.textContent = file.name;
+    removePhotoBtn.hidden = false;
+    renderFrontAndBack();
+  } catch (err) {
+    console.error(err);
+    setStatus(`Couldn't read that image (${(err as Error).message}).`, true);
+  }
+}
+
+wireDropZone(photoDropZone, photoInput, handlePhotoFile);
+
+removePhotoBtn.addEventListener("click", () => {
+  if (!currentCardData) return;
+  currentCardData.photo = null;
+  resetPhotoUploader();
+  renderFrontAndBack();
+});
 
 downloadBtn.addEventListener("click", () => {
   const blob = new Blob([currentSvg], { type: "image/svg+xml" });

@@ -77,8 +77,14 @@ export function renderBaseball(data: CardData): string {
   <rect x="4" y="4" width="332" height="472" rx="10" fill="${BB_CREAM}" stroke="${BB_INK}" stroke-opacity="0.65" stroke-width="2" />
   <rect x="14" y="14" width="312" height="452" rx="6" fill="none" stroke="${BB_INK}" stroke-opacity="0.2" stroke-width="1" />
 
-  <rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="url(#bbPhoto)" stroke="${BB_INK}" stroke-opacity="0.3" stroke-width="1" />
-  <text x="170" y="${photoY + photoH / 2}" dominant-baseline="central" text-anchor="middle" font-size="150" font-weight="800" fill="${colors.text}" fill-opacity="0.14">${escapeXml(initials(data.name))}</text>
+  ${
+    data.photo
+      ? `<clipPath id="bbPhotoClip"><rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" /></clipPath>
+  <image href="${data.photo}" x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" clip-path="url(#bbPhotoClip)" preserveAspectRatio="xMidYMid slice" />
+  <rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="none" stroke="${BB_INK}" stroke-opacity="0.3" stroke-width="1" />`
+      : `<rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="url(#bbPhoto)" stroke="${BB_INK}" stroke-opacity="0.3" stroke-width="1" />
+  <text x="170" y="${photoY + photoH / 2}" dominant-baseline="central" text-anchor="middle" font-size="150" font-weight="800" fill="${colors.text}" fill-opacity="0.14">${escapeXml(initials(data.name))}</text>`
+  }
   <rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="url(#bbSheen)" />
 
   <polygon points="${photoX},${photoY} ${photoX + 76},${photoY} ${photoX + 60},${photoY + 26} ${photoX},${photoY + 26}" fill="${colors.to}" stroke="${BB_INK}" stroke-opacity="0.4" stroke-width="0.75" />
