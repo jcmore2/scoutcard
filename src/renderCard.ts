@@ -1,7 +1,9 @@
 import type { CardData } from "./types.js";
 import { tierColors } from "./scoring.js";
 import { escapeXml, initials, truncate, flagFragment } from "./cardTextUtils.js";
-import { tierLevel, sparkle, holoPatternDefs, laurelBranch } from "./tierEffects.js";
+import { tierLevel, sparkle, laurelBranch } from "./tierEffects.js";
+import { commonPatternDefs, rarePatternDefs, rareStrokes, inFormStrokes, iconStrokes } from "./tierBackgrounds.js";
+import { renderId } from "./uid.js";
 
 const STAT_LABELS: [key: keyof CardData["stats"], label: string][] = [
   ["pac", "PAC"],
@@ -31,6 +33,11 @@ function singleLineFontSize(text: string, maxWidth: number, maxSize: number, min
 }
 
 export function renderCard(data: CardData): string {
+  // Suffixes every id below so this card's gradients/clips never collide
+  // with another FUT card's on the same page (e.g. the hero showcase demo)
+  // — duplicate SVG ids make url(#id) resolve to whichever element is
+  // first in the document, not necessarily this one's own defs.
+  const rid = renderId();
   const colors = tierColors(data.tier);
   const name = truncate(data.name.toUpperCase(), 26);
   const nameSize = singleLineFontSize(name, 260, 24, 12);
@@ -46,6 +53,27 @@ export function renderCard(data: CardData): string {
   const sparklePositions: [number, number, number][] = [];
   if (level >= 2) sparklePositions.push([155, 76, 7], [315, 76, 7]);
   if (level >= 4) sparklePositions.push([155, 228, 6], [315, 228, 6]);
+
+  // Bespoke background art per tier, modeled on official FUT card designs
+  // rather than a generic effect scaling up with rarity: Bronze gets the
+  // plain "Common" dot texture, Silver/Gold get "Rare"'s dots + diagonal
+  // brushstrokes (recolored per tier, the way a real Rare card exists at
+  // every color), and TOTY/Icon get their own fixed "In-Form"/"Icon" look.
+  const dotPatternId = data.tier === "BRONZE" ? `commonDots${rid}` : data.tier === "SILVER" || data.tier === "GOLD" ? `rareDots${rid}` : null;
+  const dotPatternDefs =
+    data.tier === "BRONZE"
+      ? commonPatternDefs(`commonDots${rid}`, colors)
+      : data.tier === "SILVER" || data.tier === "GOLD"
+        ? rarePatternDefs(`rareDots${rid}`, colors)
+        : "";
+  const backgroundStrokes =
+    data.tier === "SILVER" || data.tier === "GOLD"
+      ? rareStrokes(colors)
+      : data.tier === "TOTY"
+        ? inFormStrokes(colors)
+        : data.tier === "ICON"
+          ? iconStrokes(colors)
+          : "";
 
   // A tall arched photo window (not a small circle) — the "hero shot" real
   // rating cards build the whole layout around — with a soft radial fade
@@ -69,22 +97,19 @@ export function renderCard(data: CardData): string {
 
   return `<svg viewBox="0 0 340 480" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
   <defs>
-    <linearGradient id="cardBg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="cardBg${rid}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="${colors.from}" />
       <stop offset="0.55" stop-color="${colors.to}" />
       <stop offset="1" stop-color="${colors.from}" />
     </linearGradient>
-    <radialGradient id="cardSheen" cx="0.3" cy="0.08" r="0.7">
+    <radialGradient id="cardSheen${rid}" cx="0.3" cy="0.08" r="0.7">
       <stop offset="0" stop-color="#ffffff" stop-opacity="0.35" />
       <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
     </radialGradient>
-    <pattern id="cardTexture" width="10" height="10" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
-      <line x1="0" y1="0" x2="0" y2="10" stroke="${colors.text}" stroke-opacity="0.05" stroke-width="4" />
-    </pattern>
-    <clipPath id="shieldClip">
+    <clipPath id="shieldClip${rid}">
       <path d="${SHIELD_PATH}" />
     </clipPath>
-    ${level >= 3 ? holoPatternDefs("holoFoil") : ""}
+    ${dotPatternDefs}
   </defs>
 
   ${
@@ -97,13 +122,13 @@ export function renderCard(data: CardData): string {
       ? `<path d="${SHIELD_PATH}" fill="none" stroke="${colors.from}" stroke-opacity="0.85" stroke-width="1.5" transform="translate(170 240) scale(1.02) translate(-170 -240)" />`
       : ""
   }
-  <path d="${SHIELD_PATH}" fill="url(#cardBg)" stroke="${colors.text}" stroke-opacity="0.4" stroke-width="3" />
+  <path d="${SHIELD_PATH}" fill="url(#cardBg${rid})" stroke="${colors.text}" stroke-opacity="0.4" stroke-width="3" />
   <path d="${SHIELD_PATH}" fill="none" stroke="${colors.text}" stroke-opacity="0.25" stroke-width="1" transform="translate(170 240) scale(0.965) translate(-170 -240)" />
-  <path d="${SHIELD_PATH}" fill="url(#cardTexture)" />
-  <path d="${SHIELD_PATH}" fill="url(#cardSheen)" />
-  ${level >= 3 ? `<path d="${SHIELD_PATH}" fill="url(#holoFoil)" />` : ""}
+  ${dotPatternId ? `<path d="${SHIELD_PATH}" fill="url(#${dotPatternId})" />` : ""}
+  <path d="${SHIELD_PATH}" fill="url(#cardSheen${rid})" />
 
-  <g clip-path="url(#shieldClip)">
+  <g clip-path="url(#shieldClip${rid})">
+    ${backgroundStrokes}
     <text x="170" y="270" font-size="240" font-weight="800" fill="${colors.text}" fill-opacity="0.08" text-anchor="middle" font-family="'Arial Black', Arial, sans-serif">${data.overall}</text>
 
     ${laurelBranch(170, 20, 15, 100, 190, 3, colors.text)}
@@ -125,19 +150,19 @@ export function renderCard(data: CardData): string {
     <text x="312" y="48" font-size="8" font-weight="700" fill="${colors.text}" opacity="0.55" text-anchor="end">${data.mode === "SCOUT" ? "PDF SCOUT" : "FULL EXPORT"}</text>
 
     <defs>
-      <clipPath id="archClip"><path d="${archPath}" /></clipPath>
-      <radialGradient id="archMelt" cx="0.5" cy="0.32" r="0.78">
+      <clipPath id="archClip${rid}"><path d="${archPath}" /></clipPath>
+      <radialGradient id="archMelt${rid}" cx="0.5" cy="0.32" r="0.78">
         <stop offset="0.5" stop-color="${colors.to}" stop-opacity="0" />
         <stop offset="1" stop-color="${colors.to}" stop-opacity="0.95" />
       </radialGradient>
     </defs>
     ${
       data.photo
-        ? `<image href="${data.photo}" x="${archX1}" y="${archBaseY - archRy}" width="${archX2 - archX1}" height="${archBottomY - (archBaseY - archRy)}" clip-path="url(#archClip)" preserveAspectRatio="xMidYMid slice" />`
+        ? `<image href="${data.photo}" x="${archX1}" y="${archBaseY - archRy}" width="${archX2 - archX1}" height="${archBottomY - (archBaseY - archRy)}" clip-path="url(#archClip${rid})" preserveAspectRatio="xMidYMid slice" />`
         : `<path d="${archPath}" fill="#ffffff" fill-opacity="0.2" />
-    <text x="${archCenterX}" y="165" font-size="64" font-weight="800" fill="${colors.text}" fill-opacity="0.8" text-anchor="middle" clip-path="url(#archClip)">${escapeXml(initials(data.name))}</text>`
+    <text x="${archCenterX}" y="165" font-size="64" font-weight="800" fill="${colors.text}" fill-opacity="0.8" text-anchor="middle" clip-path="url(#archClip${rid})">${escapeXml(initials(data.name))}</text>`
     }
-    <path d="${archPath}" fill="url(#archMelt)" />
+    <path d="${archPath}" fill="url(#archMelt${rid})" />
     <path d="${archPath}" fill="none" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.55" />
     ${
       level >= 4

@@ -25,13 +25,19 @@ export function computeTier(overall: number): Tier {
   return "BRONZE";
 }
 
+// TOTY and Icon match the palette of their real FUT counterparts (an
+// "In-Form" card is black + gold streaks; an Icon card is white/gold
+// marble) rather than an arbitrary color, since those two are meant to look
+// like a genuinely different class of card everywhere they're used —
+// badges, borders, the tier legend on the card back — not just on the
+// FIFA/FUT style's bespoke background art.
 const TIER_COLORS: Record<Tier, { from: string; to: string; text: string }> = {
   BRONZE: { from: "#CD7F32", to: "#5A3A18", text: "#2A1A0C" },
   SILVER: { from: "#E4E7EB", to: "#8B96A5", text: "#262B33" },
   GOLD: { from: "#F5D77E", to: "#B8860B", text: "#3A2806" },
   "IN-FORM": { from: "#FF6B7A", to: "#8C0F1F", text: "#4A0A14" },
-  TOTY: { from: "#7FB2FF", to: "#12306B", text: "#10254F" },
-  ICON: { from: "#FFF6D8", to: "#C9A94B", text: "#2A1A45" },
+  TOTY: { from: "#3A3A3E", to: "#0A0A0C", text: "#F0C419" },
+  ICON: { from: "#FFF9EA", to: "#D8B667", text: "#2B2410" },
 };
 
 export function tierColors(tier: Tier) {

@@ -2,6 +2,7 @@ import type { CardData, Stats } from "./types.js";
 import { tierColors } from "./scoring.js";
 import { escapeXml, initials, wrapName, nameFontSize, truncate, flagFragment } from "./cardTextUtils.js";
 import { tierLevel, sparkle, holoPatternDefs } from "./tierEffects.js";
+import { renderId } from "./uid.js";
 
 const STAT_ORDER: (keyof Stats)[] = ["pac", "sho", "pas", "dri", "def", "phy"];
 export const TCG_FONT = "'Trebuchet MS', Verdana, sans-serif";
@@ -48,6 +49,9 @@ function energyPip(cx: number, cy: number, r: number, key: keyof Stats): string 
 // replaced. Laid out with an explicit vertical cursor so it's easy to
 // re-check that nothing overflows when the name wraps to 2 lines.
 export function renderCardTcg(data: CardData): string {
+  // Suffixes every id below so this card's gradients/clips never collide
+  // with another TCG card's on the same page (e.g. the hero showcase demo).
+  const rid = renderId();
   const colors = tierColors(data.tier);
   const weakest = lowestStat(data.stats);
 
@@ -112,15 +116,15 @@ export function renderCardTcg(data: CardData): string {
 
   return `<svg viewBox="0 0 340 480" xmlns="http://www.w3.org/2000/svg" font-family="${TCG_FONT}">
   <defs>
-    <linearGradient id="tcgBorder" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="tcgBorder${rid}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="${GOLD_BORDER.from}" />
       <stop offset="1" stop-color="${GOLD_BORDER.to}" />
     </linearGradient>
-    <linearGradient id="tcgArt" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="tcgArt${rid}" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${colors.from}" />
       <stop offset="1" stop-color="${colors.to}" />
     </linearGradient>
-    <linearGradient id="tcgShine" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="tcgShine${rid}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#ffffff" stop-opacity="0" />
       <stop offset="0.38" stop-color="#fff6c8" stop-opacity="0.65" />
       <stop offset="0.48" stop-color="#ffe9a8" stop-opacity="0.75" />
@@ -128,7 +132,7 @@ export function renderCardTcg(data: CardData): string {
       <stop offset="0.68" stop-color="#ffffff" stop-opacity="0" />
       <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
     </linearGradient>
-    ${level >= 3 ? holoPatternDefs("tcgHoloFoil") : ""}
+    ${level >= 3 ? holoPatternDefs(`tcgHoloFoil${rid}`) : ""}
   </defs>
 
   ${
@@ -141,12 +145,12 @@ export function renderCardTcg(data: CardData): string {
       ? `<rect x="1.5" y="1.5" width="337" height="477" rx="18" fill="none" stroke="${colors.from}" stroke-opacity="0.9" stroke-width="1.5" />`
       : ""
   }
-  <rect x="4" y="4" width="332" height="472" rx="16" fill="url(#tcgBorder)" stroke="${BORDER_EDGE}" stroke-width="2.5" />
-  <rect x="4" y="4" width="332" height="472" rx="16" fill="url(#tcgShine)" />
-  ${level >= 3 ? `<rect x="4" y="4" width="332" height="472" rx="16" fill="url(#tcgHoloFoil)" />` : ""}
+  <rect x="4" y="4" width="332" height="472" rx="16" fill="url(#tcgBorder${rid})" stroke="${BORDER_EDGE}" stroke-width="2.5" />
+  <rect x="4" y="4" width="332" height="472" rx="16" fill="url(#tcgShine${rid})" />
+  ${level >= 3 ? `<rect x="4" y="4" width="332" height="472" rx="16" fill="url(#tcgHoloFoil${rid})" />` : ""}
   <rect x="9" y="9" width="322" height="462" rx="13" fill="none" stroke="${BORDER_EDGE}" stroke-opacity="0.6" stroke-width="1" />
   <rect x="13" y="13" width="314" height="454" rx="11" fill="${PAPER}" />
-  ${level >= 3 ? `<rect x="13" y="13" width="314" height="454" rx="11" fill="url(#tcgHoloFoil)" opacity="0.55" />` : ""}
+  ${level >= 3 ? `<rect x="13" y="13" width="314" height="454" rx="11" fill="url(#tcgHoloFoil${rid})" opacity="0.55" />` : ""}
 
   <rect x="21" y="${badgeY}" width="${level === 4 ? 84 : 72}" height="14" rx="7" fill="${colors.from}" />
   <text x="${level === 4 ? 63 : 57}" y="${badgeY + 10}" font-size="8" font-weight="800" fill="${colors.text}" text-anchor="middle">${tierBadgeLabel}</text>
@@ -169,15 +173,15 @@ export function renderCardTcg(data: CardData): string {
   ${
     data.photo
       ? `<defs>
-    <clipPath id="tcgArtClip"><rect x="21" y="${artY}" width="298" height="${artHeight}" rx="8" /></clipPath>
-    <linearGradient id="tcgArtMelt" x1="0" y1="0" x2="0" y2="1">
+    <clipPath id="tcgArtClip${rid}"><rect x="21" y="${artY}" width="298" height="${artHeight}" rx="8" /></clipPath>
+    <linearGradient id="tcgArtMelt${rid}" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0.5" stop-color="${colors.to}" stop-opacity="0" />
       <stop offset="1" stop-color="${colors.to}" stop-opacity="0.9" />
     </linearGradient>
   </defs>
-  <image href="${data.photo}" x="21" y="${artY}" width="298" height="${artHeight}" clip-path="url(#tcgArtClip)" preserveAspectRatio="xMidYMid slice" />
-  <rect x="21" y="${artY}" width="298" height="${artHeight}" fill="url(#tcgArtMelt)" clip-path="url(#tcgArtClip)" />`
-      : `<rect x="21" y="${artY}" width="298" height="${artHeight}" rx="8" fill="url(#tcgArt)" stroke="${INK}" stroke-opacity="0.2" />
+  <image href="${data.photo}" x="21" y="${artY}" width="298" height="${artHeight}" clip-path="url(#tcgArtClip${rid})" preserveAspectRatio="xMidYMid slice" />
+  <rect x="21" y="${artY}" width="298" height="${artHeight}" fill="url(#tcgArtMelt${rid})" clip-path="url(#tcgArtClip${rid})" />`
+      : `<rect x="21" y="${artY}" width="298" height="${artHeight}" rx="8" fill="url(#tcgArt${rid})" stroke="${INK}" stroke-opacity="0.2" />
   <circle cx="170" cy="${artY + artHeight / 2}" r="42" fill="#ffffff" fill-opacity="0.3" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.4" />
   <text x="170" y="${artY + artHeight / 2 + 9}" font-size="28" font-weight="800" fill="${colors.text}" text-anchor="middle">${escapeXml(initials(data.name))}</text>`
   }

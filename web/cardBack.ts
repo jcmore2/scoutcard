@@ -4,6 +4,7 @@ import { GOLD_BORDER, BORDER_EDGE, PAPER, INK, TCG_FONT } from "../src/renderCar
 import { BB_CREAM, BB_INK, BB_FONT } from "../src/renderBaseball.js";
 import { STAT_DESCRIPTIONS, TIER_BANDS, SCORING_VERSION } from "../src/statDescriptions.js";
 import { escapeXml, truncate, wrapText } from "../src/cardTextUtils.js";
+import { renderId } from "../src/uid.js";
 import type { CardData, CardStyle, Stats } from "../src/types.js";
 
 const STAT_ORDER: (keyof Stats)[] = ["pac", "sho", "pas", "dri", "def", "phy"];
@@ -101,18 +102,19 @@ function backContentSvg(data: CardData, box: BackBox): string {
 // Matches the FUT front's shield silhouette, gradient, and sans-serif type
 // exactly (same SHIELD_PATH import) instead of a plain rectangle.
 function renderFutBack(data: CardData): string {
+  const rid = renderId();
   const colors = tierColors(data.tier);
   return `<svg viewBox="0 0 340 480" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="backBg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="backBg${rid}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="${colors.from}" />
       <stop offset="0.55" stop-color="${colors.to}" />
       <stop offset="1" stop-color="${colors.from}" />
     </linearGradient>
-    <clipPath id="backShieldClip"><path d="${SHIELD_PATH}" /></clipPath>
+    <clipPath id="backShieldClip${rid}"><path d="${SHIELD_PATH}" /></clipPath>
   </defs>
-  <path d="${SHIELD_PATH}" fill="url(#backBg)" stroke="${colors.text}" stroke-opacity="0.4" stroke-width="3" />
-  <g clip-path="url(#backShieldClip)">
+  <path d="${SHIELD_PATH}" fill="url(#backBg${rid})" stroke="${colors.text}" stroke-opacity="0.4" stroke-width="3" />
+  <g clip-path="url(#backShieldClip${rid})">
     ${backContentSvg(data, { x: 28, y: 34, width: 284, height: 416, color: colors.text, fontFamily: "Arial, sans-serif" })}
   </g>
 </svg>`;
@@ -121,14 +123,15 @@ function renderFutBack(data: CardData): string {
 // Matches the TCG front's yellow border, parchment fill, and rounded
 // sans-serif type.
 function renderTcgBack(data: CardData): string {
+  const rid = renderId();
   return `<svg viewBox="0 0 340 480" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="backBorder" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="backBorder${rid}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="${GOLD_BORDER.from}" />
       <stop offset="1" stop-color="${GOLD_BORDER.to}" />
     </linearGradient>
   </defs>
-  <rect x="4" y="4" width="332" height="472" rx="16" fill="url(#backBorder)" stroke="${BORDER_EDGE}" stroke-width="2.5" />
+  <rect x="4" y="4" width="332" height="472" rx="16" fill="url(#backBorder${rid})" stroke="${BORDER_EDGE}" stroke-width="2.5" />
   <rect x="13" y="13" width="314" height="454" rx="11" fill="${PAPER}" />
   ${backContentSvg(data, { x: 35, y: 35, width: 270, height: 414, color: INK, fontFamily: TCG_FONT })}
 </svg>`;

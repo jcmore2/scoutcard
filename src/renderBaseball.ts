@@ -2,6 +2,7 @@ import type { CardData } from "./types.js";
 import { tierColors } from "./scoring.js";
 import { escapeXml, initials, truncate, flagFragment } from "./cardTextUtils.js";
 import { tierLevel, sparkle, holoPatternDefs } from "./tierEffects.js";
+import { renderId } from "./uid.js";
 
 // Exported so the interactive card back can match this style too.
 export const BB_CREAM = "#F5F1E8";
@@ -49,6 +50,9 @@ function sunburstPoints(cx: number, cy: number, rOuter: number, rInner: number, 
 // the shared card-back view), matching how real cards put the stat table on
 // the reverse, not the front.
 export function renderBaseball(data: CardData): string {
+  // Suffixes every id below so this card's gradients/clips never collide
+  // with another baseball card's on the same page (e.g. the hero showcase).
+  const rid = renderId();
   const colors = tierColors(data.tier);
   const team = truncate(data.company || "Free Agent", 24);
   const name = truncate(data.name.toUpperCase(), 22);
@@ -70,15 +74,15 @@ export function renderBaseball(data: CardData): string {
 
   return `<svg viewBox="0 0 340 480" xmlns="http://www.w3.org/2000/svg" font-family="${BB_FONT}">
   <defs>
-    <linearGradient id="bbPhoto" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bbPhoto${rid}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="${colors.from}" />
       <stop offset="1" stop-color="${colors.to}" />
     </linearGradient>
-    <radialGradient id="bbSheen" cx="0.32" cy="0.1" r="0.75">
+    <radialGradient id="bbSheen${rid}" cx="0.32" cy="0.1" r="0.75">
       <stop offset="0" stop-color="#ffffff" stop-opacity="0.3" />
       <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
     </radialGradient>
-    ${level >= 3 ? holoPatternDefs("bbHoloFoil") : ""}
+    ${level >= 3 ? holoPatternDefs(`bbHoloFoil${rid}`) : ""}
   </defs>
 
   ${
@@ -97,19 +101,19 @@ export function renderBaseball(data: CardData): string {
   ${
     data.photo
       ? `<defs>
-    <clipPath id="bbPhotoClip"><rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" /></clipPath>
-    <linearGradient id="bbPhotoMelt" x1="0" y1="0" x2="0" y2="1">
+    <clipPath id="bbPhotoClip${rid}"><rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" /></clipPath>
+    <linearGradient id="bbPhotoMelt${rid}" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0.62" stop-color="${colors.to}" stop-opacity="0" />
       <stop offset="1" stop-color="${colors.to}" stop-opacity="1" />
     </linearGradient>
   </defs>
-  <image href="${data.photo}" x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" clip-path="url(#bbPhotoClip)" preserveAspectRatio="xMidYMid slice" />
-  <rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="url(#bbPhotoMelt)" clip-path="url(#bbPhotoClip)" />
+  <image href="${data.photo}" x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" clip-path="url(#bbPhotoClip${rid})" preserveAspectRatio="xMidYMid slice" />
+  <rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="url(#bbPhotoMelt${rid})" clip-path="url(#bbPhotoClip${rid})" />
   <rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="none" stroke="${BB_INK}" stroke-opacity="0.3" stroke-width="1" />`
-      : `<rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="url(#bbPhoto)" stroke="${BB_INK}" stroke-opacity="0.3" stroke-width="1" />
+      : `<rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="url(#bbPhoto${rid})" stroke="${BB_INK}" stroke-opacity="0.3" stroke-width="1" />
   <text x="170" y="${photoY + photoH / 2}" dominant-baseline="central" text-anchor="middle" font-size="150" font-weight="800" fill="${colors.text}" fill-opacity="0.14">${escapeXml(initials(data.name))}</text>`
   }
-  <rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="url(#bbSheen)" />
+  <rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="url(#bbSheen${rid})" />
 
   <polygon points="${photoX},${photoY} ${photoX + 76},${photoY} ${photoX + 60},${photoY + 26} ${photoX},${photoY + 26}" fill="${colors.to}" stroke="${BB_INK}" stroke-opacity="0.4" stroke-width="0.75" />
   <text x="${photoX + 10}" y="${photoY + 18}" font-size="12" font-weight="800" fill="${BB_CREAM}" letter-spacing="0.5">${escapeXml(teamCode(team))}</text>
@@ -141,6 +145,6 @@ export function renderBaseball(data: CardData): string {
 
   <text x="170" y="${footerTop + 78}" font-size="8" fill="${BB_MUTED}" opacity="0.85" text-anchor="middle" letter-spacing="0.5">SCOUTCARD · FLIP FOR FULL STATS</text>
   <text x="170" y="${footerTop + 94}" font-size="8" fill="${BB_MUTED}" opacity="0.7" text-anchor="middle">No. ${String(data.overall).padStart(2, "0")}/99</text>
-  ${level >= 3 ? `<rect x="14" y="14" width="312" height="452" rx="6" fill="url(#bbHoloFoil)" opacity="0.6" />` : ""}
+  ${level >= 3 ? `<rect x="14" y="14" width="312" height="452" rx="6" fill="url(#bbHoloFoil${rid})" opacity="0.6" />` : ""}
 </svg>`;
 }
