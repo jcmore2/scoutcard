@@ -1,5 +1,6 @@
 import { parseProfilePdfFile } from "./lib/parsePdfBrowser.js";
 import { loadFlagGraphic } from "./lib/flagSvgBrowser.js";
+import { svgToPngBlob } from "./lib/svgToPng.js";
 import { computeOverall, computeTier, computeArchetype } from "../src/scoring.js";
 import { computeStatsFromPdfProfile } from "../src/pdf/scoringPdf.js";
 import { guessCountryCode } from "../src/country.js";
@@ -38,8 +39,9 @@ const cardFront = document.getElementById("card-front") as HTMLDivElement;
 const cardBack = document.getElementById("card-back") as HTMLDivElement;
 const downloadBtn = document.getElementById("download-btn") as HTMLButtonElement;
 const newCardBtn = document.getElementById("new-card-btn") as HTMLButtonElement;
-const shareXBtn = document.getElementById("share-x") as HTMLButtonElement;
 const shareLinkedInBtn = document.getElementById("share-linkedin") as HTMLButtonElement;
+const shareInstagramBtn = document.getElementById("share-instagram") as HTMLButtonElement;
+const shareTiktokBtn = document.getElementById("share-tiktok") as HTMLButtonElement;
 
 let currentSvg = "";
 let currentCardData: CardData | null = null;
@@ -235,12 +237,64 @@ function shareText(): string {
   return `I just scouted my career with ScoutCard — overall ${currentCardData.overall}, ${currentCardData.tier} 🃏`;
 }
 
-shareXBtn.addEventListener("click", () => {
-  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText())}&url=${encodeURIComponent(SITE_URL)}`;
-  window.open(url, "_blank", "noopener,noreferrer");
-});
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
-shareLinkedInBtn.addEventListener("click", () => {
+type ShareNetwork = "linkedin" | "instagram" | "tiktok";
+
+function openLinkedInIntent() {
   const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SITE_URL)}`;
   window.open(url, "_blank", "noopener,noreferrer");
-});
+}
+
+// LinkedIn's web share intent only takes a text + link — it can't attach a
+// file to the compose window, and there's no backend here to host a
+// per-card image at a stable URL for its link-preview scraper either.
+// Instagram and TikTok don't even have a web compose intent to fall back
+// to — they're mobile-app-first and expose no URL scheme for pre-filled
+// sharing at all. So the real card images go out through the Web Share API
+// instead, which *can* attach files and hands the user's OS the actual
+// front+back PNGs to share to whichever app they pick, all three included.
+// Where that's unsupported (most desktop browsers today), fall back to
+// downloading both images — for LinkedIn there's at least a compose window
+// to open afterward, for Instagram/TikTok there's nothing left to automate.
+async function shareCard(network: ShareNetwork) {
+  if (!currentCardData) return;
+
+  const backSvg = renderCardBack(currentCardData, currentStyle);
+  const [frontBlob, backBlob] = await Promise.all([svgToPngBlob(currentSvg), svgToPngBlob(backSvg)]);
+  const frontFile = new File([frontBlob], "scoutcard-front.png", { type: "image/png" });
+  const backFile = new File([backBlob], "scoutcard-back.png", { type: "image/png" });
+  const files = [frontFile, backFile];
+
+  if (navigator.canShare?.({ files })) {
+    try {
+      await navigator.share({ files, title: "My ScoutCard", text: shareText() });
+      return;
+    } catch (err) {
+      if ((err as Error).name === "AbortError") return; // user cancelled the share sheet
+      console.error(err);
+    }
+  }
+
+  downloadBlob(frontFile, frontFile.name);
+  downloadBlob(backFile, backFile.name);
+
+  if (network === "linkedin") {
+    openLinkedInIntent();
+    setStatus(`Downloaded ${frontFile.name} and ${backFile.name} — attach them to your post, LinkedIn won't pull them in from a link.`);
+  } else {
+    const networkLabel = network === "instagram" ? "Instagram" : "TikTok";
+    setStatus(`Downloaded ${frontFile.name} and ${backFile.name} — open ${networkLabel} and share them from there, it doesn't support sharing from a browser.`);
+  }
+}
+
+shareLinkedInBtn.addEventListener("click", () => void shareCard("linkedin"));
+shareInstagramBtn.addEventListener("click", () => void shareCard("instagram"));
+shareTiktokBtn.addEventListener("click", () => void shareCard("tiktok"));
