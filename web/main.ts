@@ -56,8 +56,7 @@ const cardBack = document.getElementById("card-back") as HTMLDivElement;
 const downloadBtn = document.getElementById("download-btn") as HTMLButtonElement;
 const newCardBtn = document.getElementById("new-card-btn") as HTMLButtonElement;
 const shareLinkedInBtn = document.getElementById("share-linkedin") as HTMLButtonElement;
-const shareInstagramBtn = document.getElementById("share-instagram") as HTMLButtonElement;
-const shareTiktokBtn = document.getElementById("share-tiktok") as HTMLButtonElement;
+const shareMailBtn = document.getElementById("share-mail") as HTMLButtonElement;
 
 const galleryEl = document.getElementById("gallery") as HTMLElement;
 const galleryGrid = document.getElementById("gallery-grid") as HTMLDivElement;
@@ -334,24 +333,29 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-type ShareNetwork = "linkedin" | "instagram" | "tiktok";
+type ShareNetwork = "linkedin" | "mail";
 
 function openLinkedInIntent() {
   const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SITE_URL)}`;
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
-// LinkedIn's web share intent only takes a text + link — it can't attach a
-// file to the compose window, and there's no backend here to host a
-// per-card image at a stable URL for its link-preview scraper either.
-// Instagram and TikTok don't even have a web compose intent to fall back
-// to — they're mobile-app-first and expose no URL scheme for pre-filled
-// sharing at all. So the real card images go out through the Web Share API
-// instead, which *can* attach files and hands the user's OS the actual
-// front+back PNGs to share to whichever app they pick, all three included.
-// Where that's unsupported (most desktop browsers today), fall back to
-// downloading both images — for LinkedIn there's at least a compose window
-// to open afterward, for Instagram/TikTok there's nothing left to automate.
+function openMailIntent() {
+  const subject = encodeURIComponent("My ScoutCard");
+  const body = encodeURIComponent(`${shareText()}\n\n${SITE_URL}`);
+  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+}
+
+// Neither LinkedIn's web share intent nor a mailto: link can attach a file
+// — LinkedIn's only takes a text + link, and mailto: has no attachment
+// parameter at all — and there's no backend here to host a per-card image
+// at a stable URL for LinkedIn's link-preview scraper either. So the real
+// card images go out through the Web Share API instead, which *can* attach
+// files and hands the user's OS the actual front+back PNGs to share to
+// whichever app they pick, mail apps included. Where that's unsupported
+// (most desktop browsers today), fall back to downloading both images and
+// opening the compose window anyway, so there's still something to
+// manually attach.
 async function shareCard(network: ShareNetwork) {
   if (!currentCardData) return;
 
@@ -374,15 +378,13 @@ async function shareCard(network: ShareNetwork) {
   downloadBlob(frontFile, frontFile.name);
   downloadBlob(backFile, backFile.name);
 
-  if (network === "linkedin") {
-    openLinkedInIntent();
-    setStatus(`Downloaded ${frontFile.name} and ${backFile.name} — attach them to your post, LinkedIn won't pull them in from a link.`);
-  } else {
-    const networkLabel = network === "instagram" ? "Instagram" : "TikTok";
-    setStatus(`Downloaded ${frontFile.name} and ${backFile.name} — open ${networkLabel} and share them from there, it doesn't support sharing from a browser.`);
-  }
+  const networkLabel = network === "linkedin" ? "LinkedIn" : "Mail";
+  if (network === "linkedin") openLinkedInIntent();
+  else openMailIntent();
+  setStatus(
+    `Downloaded ${frontFile.name} and ${backFile.name} — attach them ${network === "mail" ? "to your email" : "to your post"}, ${networkLabel} won't pull them in from a link.`,
+  );
 }
 
 shareLinkedInBtn.addEventListener("click", () => void shareCard("linkedin"));
-shareInstagramBtn.addEventListener("click", () => void shareCard("instagram"));
-shareTiktokBtn.addEventListener("click", () => void shareCard("tiktok"));
+shareMailBtn.addEventListener("click", () => void shareCard("mail"));
