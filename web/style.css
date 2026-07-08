@@ -530,3 +530,9 @@ footer a {
 footer a:hover {
   color: var(--paper);
 }
+
+.footer-divider {
+  color: var(--border);
+  margin: 0 8px;
+  font-size: 0.85rem;
+}
