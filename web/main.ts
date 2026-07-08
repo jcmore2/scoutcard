@@ -8,6 +8,8 @@ import { renderCardBack } from "./cardBack.js";
 import { initHeroShowcase } from "./heroShowcase.js";
 import type { CardData, CardStyle } from "../src/types.js";
 
+const SITE_URL = "https://jcmore2.github.io/scoutcard/";
+
 const heroShowcase = document.getElementById("hero-showcase") as HTMLDivElement;
 initHeroShowcase(heroShowcase);
 
@@ -20,7 +22,14 @@ const PDF_DROP_DEFAULT = pdfDropLabel.textContent ?? "";
 
 const styleFutBtn = document.getElementById("style-fut") as HTMLButtonElement;
 const styleTcgBtn = document.getElementById("style-tcg") as HTMLButtonElement;
+const styleBaseballBtn = document.getElementById("style-baseball") as HTMLButtonElement;
+const styleButtons: Record<CardStyle, HTMLButtonElement> = {
+  fut: styleFutBtn,
+  tcg: styleTcgBtn,
+  baseball: styleBaseballBtn,
+};
 
+const spinner = document.getElementById("spinner") as HTMLDivElement;
 const statusEl = document.getElementById("status") as HTMLParagraphElement;
 const resultEl = document.getElementById("result") as HTMLElement;
 const cardFlip = document.getElementById("card-flip") as HTMLDivElement;
@@ -29,6 +38,8 @@ const cardFront = document.getElementById("card-front") as HTMLDivElement;
 const cardBack = document.getElementById("card-back") as HTMLDivElement;
 const downloadBtn = document.getElementById("download-btn") as HTMLButtonElement;
 const newCardBtn = document.getElementById("new-card-btn") as HTMLButtonElement;
+const shareXBtn = document.getElementById("share-x") as HTMLButtonElement;
+const shareLinkedInBtn = document.getElementById("share-linkedin") as HTMLButtonElement;
 
 let currentSvg = "";
 let currentCardData: CardData | null = null;
@@ -39,26 +50,59 @@ function setStatus(message: string, isError = false) {
   statusEl.classList.toggle("error", isError);
 }
 
+function setLoading(isLoading: boolean) {
+  spinner.hidden = !isLoading;
+}
+
 const SQUEEZE_MS = 160;
+const COUNT_UP_MS = 700;
+
+// Numbers in the downloaded card.svg always show their real value (so it
+// looks right with no JS at all) — this just replays them from 0 for the
+// live page, using each element's own data-count-to as the target.
+function animateCountUp(root: ParentNode) {
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const elements = root.querySelectorAll<SVGTextElement>("[data-count-to]");
+  elements.forEach((el) => {
+    const target = parseInt(el.getAttribute("data-count-to") ?? "", 10);
+    if (Number.isNaN(target)) return;
+    if (prefersReducedMotion) {
+      el.textContent = String(target);
+      return;
+    }
+    const start = performance.now();
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - start) / COUNT_UP_MS);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = String(Math.round(target * eased));
+      if (progress < 1) requestAnimationFrame(tick);
+      else el.textContent = String(target);
+    };
+    el.textContent = "0";
+    requestAnimationFrame(tick);
+  });
+}
 
 function renderFrontAndBack() {
   if (!currentCardData) return;
   currentSvg = renderCardStyled(currentCardData, currentStyle);
   cardFront.innerHTML = currentSvg;
   cardBack.innerHTML = renderCardBack(currentCardData, currentStyle);
+  animateCountUp(cardFront);
 }
 
 function setStyle(style: CardStyle) {
   currentStyle = style;
-  styleFutBtn.classList.toggle("active", style === "fut");
-  styleTcgBtn.classList.toggle("active", style === "tcg");
-  styleFutBtn.setAttribute("aria-selected", String(style === "fut"));
-  styleTcgBtn.setAttribute("aria-selected", String(style === "tcg"));
+  (Object.keys(styleButtons) as CardStyle[]).forEach((key) => {
+    styleButtons[key].classList.toggle("active", key === style);
+    styleButtons[key].setAttribute("aria-selected", String(key === style));
+  });
   renderFrontAndBack();
 }
 
 styleFutBtn.addEventListener("click", () => setStyle("fut"));
 styleTcgBtn.addEventListener("click", () => setStyle("tcg"));
+styleBaseballBtn.addEventListener("click", () => setStyle("baseball"));
 
 function triggerRevealAnimation() {
   // Remove-then-reflow-then-add so the animation restarts even if the
@@ -118,7 +162,8 @@ async function handlePdfFile(file: File) {
     return;
   }
   pdfDropLabel.textContent = file.name;
-  setStatus("Parsing the PDF locally… nothing is being uploaded.");
+  setStatus("Reading your PDF locally — nothing is uploaded anywhere…");
+  setLoading(true);
   resultEl.hidden = true;
 
   try {
@@ -136,6 +181,7 @@ async function handlePdfFile(file: File) {
       company: profile.company,
       country,
       flag,
+      profileUrl: profile.profileUrl,
       stats,
       overall,
       tier,
@@ -145,7 +191,12 @@ async function handlePdfFile(file: File) {
     });
   } catch (err) {
     console.error(err);
-    setStatus(`Couldn't parse that PDF: ${(err as Error).message}`, true);
+    setStatus(
+      `Couldn't read that PDF (${(err as Error).message}). Make sure it's an unmodified "Save to PDF" export from a LinkedIn profile, then try again.`,
+      true,
+    );
+  } finally {
+    setLoading(false);
   }
 }
 
@@ -177,4 +228,19 @@ downloadBtn.addEventListener("click", () => {
   a.download = "card.svg";
   a.click();
   URL.revokeObjectURL(url);
+});
+
+function shareText(): string {
+  if (!currentCardData) return "I just scouted my career with ScoutCard ⚽";
+  return `I just scouted my career with ScoutCard — overall ${currentCardData.overall}, ${currentCardData.tier} 🃏`;
+}
+
+shareXBtn.addEventListener("click", () => {
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText())}&url=${encodeURIComponent(SITE_URL)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+});
+
+shareLinkedInBtn.addEventListener("click", () => {
+  const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SITE_URL)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
 });

@@ -1,5 +1,10 @@
 import type { SourceMode, Stats } from "./types.js";
 
+// Bump this whenever a scoring formula (src/scoring.ts, src/pdf/scoringPdf.ts)
+// changes, so a card generated under an older formula stays self-explanatory
+// instead of silently meaning something different once shared.
+export const SCORING_VERSION = "v1";
+
 export const STAT_DESCRIPTIONS: Record<SourceMode, Record<keyof Stats, string>> = {
   FULL: {
     pac: "Posts + comments in the last 12 months",

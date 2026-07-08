@@ -4,6 +4,7 @@ export interface ParsedProfile {
   headline: string;
   company: string; // most recent/current employer, from Positions.csv
   location: string; // free-text "Geo Location" from Profile.csv, e.g. "San Francisco Bay Area"
+  profileUrl: string; // not available in the data export — always "" here
   positionYears: number; // total years spanned across Positions.csv
   skillCount: number; // unique entries in Skills.csv
   connectionCount: number; // rows in Connections.csv
@@ -24,6 +25,7 @@ export interface PdfProfile {
   headline: string;
   company: string; // most recent/current employer, first entry in the Experience section
   location: string; // free-text profile location line, e.g. "Madrid y alrededores"
+  profileUrl: string; // the profile's own linkedin.com/in/... URL, from the Contact section
   positionYears: number; // career span, earliest role start to latest end/present
   roleCount: number; // number of distinct positions listed
   certCount: number;
@@ -50,7 +52,7 @@ export interface Stats {
 
 export type Tier = "BRONZE" | "SILVER" | "GOLD" | "IN-FORM" | "TOTY" | "ICON";
 export type SourceMode = "FULL" | "SCOUT";
-export type CardStyle = "fut" | "tcg";
+export type CardStyle = "fut" | "tcg" | "baseball";
 
 export interface CardData {
   name: string;
@@ -58,6 +60,7 @@ export interface CardData {
   company: string;
   country: string;
   flag: FlagGraphic | null;
+  profileUrl: string;
   stats: Stats;
   overall: number;
   tier: Tier;

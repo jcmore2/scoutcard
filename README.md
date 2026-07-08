@@ -72,13 +72,25 @@ so the stat list can still be laid out with regular HTML/CSS). This is a
 web-app-only feature — the embeddable `card.svg` file (front side only) is a
 static image, so it can't be interactive inside a GitHub README `<img>`.
 
-There's also a **card style switcher**: the same scored data can render as a
-FIFA/FUT-style shield card, or as a trading-card-game-style layout
-([src/renderCardTcg.ts](src/renderCardTcg.ts)) where each stat reads as an
-"attack" with its own effect text. Switching styles re-renders instantly
-from the already-computed data — no re-upload needed. Both are original
-layouts inspired by those card formats, not any officially licensed card
-set, and say so on the card itself.
+There's also a **card style switcher** with three options — the same scored
+data re-renders instantly, no re-upload needed:
+
+- **FIFA/FUT** ([src/renderCard.ts](src/renderCard.ts)) — shield silhouette, all 6 stats on the front.
+- **Trading-card-game** ([src/renderCardTcg.ts](src/renderCardTcg.ts)) — each stat reads as an "attack" with its own energy-type color.
+- **Baseball** ([src/renderBaseball.ts](src/renderBaseball.ts)) — a classic sports-card layout: the front is just identity (photo, name, team, one headline stat), the full 6-stat breakdown lives on the back, the way real player cards split the two.
+
+All three are original layouts inspired by those card formats, not any
+officially licensed card set, and say so on the card itself. Numbers count
+up from 0 when a card first appears or you switch styles — the SVG you
+download always shows the real value immediately, the count-up is a
+browser-only touch.
+
+A few smaller touches round out the web app: a spinner while the PDF is
+being parsed, a clearer error box (with an icon and a concrete next step) if
+the file isn't a valid "Save to PDF" export, an icon-based walkthrough of
+where "Save to PDF" actually lives on a profile page, and share buttons for
+X/LinkedIn (these link to the site itself, not a specific card — see
+**Limitations** below for why there's no per-card shareable URL).
 
 ## Flag and company, but no photo or logo
 
@@ -100,6 +112,11 @@ and the only way to get a real logo would be guessing a company's domain and
 fetching it from a third-party logo API, which would leak the company name
 over the network — a real conflict with "nothing ever leaves your browser."
 The initials avatar placeholder stays as-is.
+
+The card back also links to the profile's own `linkedin.com/in/...` URL when
+the PDF export includes one (under its Contact section) — a plain link
+rather than a QR code, to avoid pulling in a QR-encoding dependency for a
+nice-to-have.
 
 ## CLI (generates a card you commit to this repo)
 
@@ -127,8 +144,9 @@ The initials avatar placeholder stays as-is.
    ```
 
 Country/flag is auto-detected from the profile's location — add `--country US`
-to either command to override the guess. Add `--style tcg` for the
-trading-card-style layout instead of the default FIFA/FUT shield.
+to either command to override the guess. Add `--style tcg` or `--style
+baseball` for one of the other two layouts instead of the default FIFA/FUT
+shield.
 
 Either way:
 
@@ -181,10 +199,14 @@ rougher guess than the full-export one — its input ranges are much smaller
 (e.g. 0–5 certifications vs. 0–500 endorsements), so there's less intuition
 for what "normal" looks like.
 
-The PDF parser recognizes English and Spanish section headers only (LinkedIn
-renders "Save to PDF" in whatever language the *viewer's* UI is set to, not
-the profile owner's) — other languages degrade gracefully to a 0 for that
-section rather than crashing.
+The PDF parser recognizes English, Spanish, French, German, and Portuguese
+section headers (LinkedIn renders "Save to PDF" in whatever language the
+*viewer's* UI is set to, not the profile owner's) — other languages degrade
+gracefully to a 0 for that section rather than crashing.
+
+Each card also shows a **scoring version** ("Scoring v1") on the back —
+bumped whenever a formula changes, so a card shared under an older formula
+stays self-explanatory instead of silently meaning something different.
 
 ## Privacy
 

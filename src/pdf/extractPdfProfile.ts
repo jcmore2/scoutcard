@@ -3,16 +3,22 @@ import type { PdfProfile } from "../types.js";
 
 // LinkedIn's "Save to PDF" renders sections in whatever language the
 // *viewer's* LinkedIn UI is set to — this profile mixes Spanish section
-// headers with English body text. Only English/Spanish headers are
-// recognized for now; other locales degrade gracefully to 0 for that
+// headers with English body text. English/Spanish/French/German/Portuguese
+// headers are recognized; other locales degrade gracefully to 0 for that
 // section rather than crashing.
-const SKILLS_HEADERS = ["aptitudes principales", "top skills"];
-const LANGUAGES_HEADERS = ["languages", "idiomas"];
-const CERTIFICATIONS_HEADERS = ["certifications", "certificaciones"];
-const EXPERIENCE_HEADERS = ["experiencia", "experience"];
-const EDUCATION_HEADERS = ["educación", "educacion", "education"];
+const SKILLS_HEADERS = ["aptitudes principales", "top skills", "principales compétences", "top-kenntnisse", "principais competências"];
+const LANGUAGES_HEADERS = ["languages", "idiomas", "langues", "sprachen"];
+const CERTIFICATIONS_HEADERS = ["certifications", "certificaciones", "zertifizierungen", "certificações", "certificados"];
+const EXPERIENCE_HEADERS = ["experiencia", "experience", "expérience", "berufserfahrung", "experiência"];
+const EDUCATION_HEADERS = ["educación", "educacion", "education", "formation", "ausbildung", "formação acadêmica", "educação"];
+const CONTACT_HEADERS = ["contact", "contactar", "contacter", "coordonnées", "kontakt", "contato", "contacte"];
 const ALL_SIDEBAR_HEADERS = [...SKILLS_HEADERS, ...LANGUAGES_HEADERS, ...CERTIFICATIONS_HEADERS];
 const ALL_HEADERS = [...ALL_SIDEBAR_HEADERS, ...EXPERIENCE_HEADERS, ...EDUCATION_HEADERS];
+
+// Matches "linkedin.com/in/<handle>" with or without a "www." prefix, so the
+// profile's own URL (shown under the Contact header) can be pulled out and
+// linked from the card back.
+const LINKEDIN_PROFILE_URL = /(?:www\.)?linkedin\.com\/in\/[a-zA-Z0-9\-_%]+/i;
 
 // A role/date line looks like "<start> - <end> (<duration>)", e.g.
 // "enero de 2025 - Present (1 año 7 meses)" or "Jun 2021 - Feb 2023 (1 yr 9 mos)".
@@ -43,6 +49,17 @@ function countSidebarSection(lines: PdfLine[], headers: string[], boundary: numb
   return Math.max(0, end - start - 1);
 }
 
+function findProfileUrl(lines: PdfLine[], boundary: number): string {
+  const start = findHeaderIndex(lines, CONTACT_HEADERS);
+  if (start === -1 || start >= boundary) return "";
+  for (let i = start + 1; i < boundary; i++) {
+    if (ALL_SIDEBAR_HEADERS.includes(norm(lines[i].text))) break;
+    const match = LINKEDIN_PROFILE_URL.exec(lines[i].text);
+    if (match) return `https://${match[0]}`;
+  }
+  return "";
+}
+
 export function extractPdfProfile(lines: PdfLine[]): PdfProfile {
   if (lines.length === 0) {
     return {
@@ -50,6 +67,7 @@ export function extractPdfProfile(lines: PdfLine[]): PdfProfile {
       headline: "",
       company: "",
       location: "",
+      profileUrl: "",
       positionYears: 0,
       roleCount: 0,
       certCount: 0,
@@ -63,6 +81,7 @@ export function extractPdfProfile(lines: PdfLine[]): PdfProfile {
   // regardless of language, unlike header text matching.
   const nameIdx = lines.reduce((best, l, i) => (l.fontSize > lines[best].fontSize ? i : best), 0);
 
+  const profileUrl = findProfileUrl(lines, nameIdx);
   const topSkillCount = countSidebarSection(lines, SKILLS_HEADERS, nameIdx);
   const languageCount = countSidebarSection(lines, LANGUAGES_HEADERS, nameIdx);
   const certCount = countSidebarSection(lines, CERTIFICATIONS_HEADERS, nameIdx);
@@ -115,6 +134,7 @@ export function extractPdfProfile(lines: PdfLine[]): PdfProfile {
     headline,
     company,
     location,
+    profileUrl,
     positionYears,
     roleCount,
     certCount,

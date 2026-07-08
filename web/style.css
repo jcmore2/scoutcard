@@ -72,12 +72,12 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  gap: 28px;
+  gap: 12px;
   margin: 28px 0 8px;
 }
 
 .showcase-card {
-  width: 132px;
+  width: 100px;
   transition: transform 0.2s ease;
 }
 
@@ -89,11 +89,15 @@ h1 {
 }
 
 .showcase-fut {
-  transform: rotate(-7deg);
+  transform: rotate(-9deg);
 }
 
 .showcase-tcg {
-  transform: rotate(7deg) translateY(10px);
+  transform: translateY(12px);
+}
+
+.showcase-baseball {
+  transform: rotate(9deg);
 }
 
 .showcase-card:hover {
@@ -133,6 +137,43 @@ h1 {
 
 .ticket-divider::after {
   right: -28px;
+}
+
+/* ---------- Walkthrough icons ---------- */
+
+.walkthrough {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  color: var(--muted);
+}
+
+.walkthrough-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.68rem;
+  font-family: "IBM Plex Mono", monospace;
+  white-space: nowrap;
+}
+
+.walkthrough-step svg {
+  width: 26px;
+  height: 26px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.walkthrough-arrow {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0.5;
 }
 
 /* ---------- Steps ---------- */
@@ -254,16 +295,61 @@ h1 {
   display: none;
 }
 
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 24px 0 12px;
+}
+
 #status {
   min-height: 1.2em;
   font-size: 0.88rem;
   color: var(--muted);
   text-align: center;
-  margin: 24px 0 12px;
+  margin: 0;
+  padding: 0;
+  transition: all 0.15s ease;
 }
 
 #status.error {
   color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+
+#status.error::before {
+  content: "⚠️ ";
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.spinner[hidden] {
+  display: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+    border-top-color: var(--border);
+  }
 }
 
 /* ---------- Result / card ---------- */
@@ -433,6 +519,13 @@ h1 {
   font-style: italic;
 }
 
+.back-link {
+  font-size: 9px;
+  color: inherit;
+  opacity: 0.75;
+  text-decoration: underline;
+}
+
 .back-hint {
   font-size: 9px;
   opacity: 0.55;
@@ -474,6 +567,34 @@ button.secondary {
 button.secondary:hover {
   border-color: var(--violet);
   color: var(--violet);
+}
+
+.share-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.share-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--paper);
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
 }
 
 footer {

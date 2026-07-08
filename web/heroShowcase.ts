@@ -2,6 +2,7 @@ import { loadFlagGraphic } from "./lib/flagSvgBrowser.js";
 import { computeOverall, computeTier, computeArchetype } from "../src/scoring.js";
 import { renderCard } from "../src/renderCard.js";
 import { renderCardTcg } from "../src/renderCardTcg.js";
+import { renderBaseball } from "../src/renderBaseball.js";
 import type { CardData, Stats } from "../src/types.js";
 
 // Fictional, deliberately good-looking stats — this is marketing content,
@@ -22,6 +23,7 @@ async function buildDemoCard(): Promise<CardData> {
     company: "Nova Labs",
     country: "US",
     flag,
+    profileUrl: "https://linkedin.com/in/alex-rivera",
     stats: DEMO_STATS,
     overall,
     tier,
@@ -36,5 +38,6 @@ export async function initHeroShowcase(container: HTMLElement) {
   container.innerHTML = `
     <div class="showcase-card showcase-fut">${renderCard(demo)}</div>
     <div class="showcase-card showcase-tcg">${renderCardTcg(demo)}</div>
+    <div class="showcase-card showcase-baseball">${renderBaseball(demo)}</div>
   `;
 }

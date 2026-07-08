@@ -40,6 +40,7 @@ async function main() {
       company: profile.company,
       country,
       flag: loadFlagGraphic(country),
+      profileUrl: profile.profileUrl,
       stats,
       overall,
       tier,
@@ -60,6 +61,7 @@ async function main() {
       company: profile.company,
       country,
       flag: loadFlagGraphic(country),
+      profileUrl: profile.profileUrl,
       stats,
       overall,
       tier,
@@ -69,12 +71,12 @@ async function main() {
     };
   } else {
     console.error(
-      "Usage: npm run generate -- --export <export.zip> | --pdf <profile.pdf> [--country US] [--style fut|tcg] [--out output/card.svg]",
+      "Usage: npm run generate -- --export <export.zip> | --pdf <profile.pdf> [--country US] [--style fut|tcg|baseball] [--out output/card.svg]",
     );
     process.exit(1);
   }
 
-  const style: CardStyle = args.style === "tcg" ? "tcg" : "fut";
+  const style: CardStyle = args.style === "tcg" || args.style === "baseball" ? args.style : "fut";
   const svg = renderCardStyled(cardData, style);
 
   mkdirSync(dirname(outPath), { recursive: true });

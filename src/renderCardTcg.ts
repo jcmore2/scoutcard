@@ -101,7 +101,7 @@ export function renderCardTcg(data: CardData): string {
     ${i > 0 ? `<line x1="21" y1="${rowY - rowHeight / 2 - 2}" x2="319" y2="${rowY - rowHeight / 2 - 2}" stroke="#B79B5B" stroke-opacity="0.3" stroke-width="0.75" />` : ""}
     ${energyPip(26, rowY - 4, 7, key)}
     <text x="40" y="${rowY}" font-size="13" font-weight="800" fill="${INK}">${key.toUpperCase()}</text>
-    <text x="316" y="${rowY}" font-size="16" font-weight="800" fill="${INK}" text-anchor="end">${data.stats[key]}</text>`;
+    <text x="316" y="${rowY}" font-size="16" font-weight="800" fill="${INK}" text-anchor="end" data-count-to="${data.stats[key]}">${data.stats[key]}</text>`;
   };
 
   return `<svg viewBox="0 0 340 480" xmlns="http://www.w3.org/2000/svg" font-family="${TCG_FONT}">
@@ -142,7 +142,7 @@ export function renderCardTcg(data: CardData): string {
     .join("\n  ")}
   ${energyPip(243, hpY - 5, 6.5, STAT_ORDER.reduce((top, k) => (data.stats[k] > data.stats[top] ? k : top), STAT_ORDER[0]))}
   <text x="270" y="${hpY}" font-size="11" font-weight="800" fill="${INK}" text-anchor="end">HP</text>
-  <text x="319" y="${hpY + 1}" font-size="22" font-weight="800" fill="${INK}" text-anchor="end">${data.overall}</text>
+  <text x="319" y="${hpY + 1}" font-size="22" font-weight="800" fill="${INK}" text-anchor="end" data-count-to="${data.overall}">${data.overall}</text>
 
   <text x="21" y="${headlineY}" font-size="8.5" fill="${MUTED_INK}" font-style="italic">${escapeXml(headlineCaption)}</text>
 

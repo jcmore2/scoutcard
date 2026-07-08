@@ -102,6 +102,7 @@ export function extractProfile(getFile: FileLookup): ParsedProfile {
     headline,
     company,
     location,
+    profileUrl: "",
     positionYears: Math.max(0, positionYears),
     skillCount,
     connectionCount: connectionRows.length,

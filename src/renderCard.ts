@@ -42,7 +42,7 @@ export function renderCard(data: CardData): string {
     x: number,
     y: number,
   ) => `
-    <text x="${x}" y="${y}" font-size="19" font-weight="800" fill="${colors.text}" font-family="'Arial Black', Arial, sans-serif">${data.stats[key]}</text>
+    <text x="${x}" y="${y}" font-size="19" font-weight="800" fill="${colors.text}" font-family="'Arial Black', Arial, sans-serif" data-count-to="${data.stats[key]}">${data.stats[key]}</text>
     <text x="${x + 32}" y="${y}" font-size="13" font-weight="700" fill="${colors.text}" font-family="Arial, sans-serif" opacity="0.85">${label}</text>`;
 
   return `<svg viewBox="0 0 340 480" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
@@ -75,7 +75,7 @@ export function renderCard(data: CardData): string {
     <rect x="158" y="10" width="15" height="15" transform="rotate(45 170 22)" fill="${colors.from}" stroke="${colors.text}" stroke-opacity="0.5" stroke-width="1" />
     <rect x="161.5" y="13.5" width="8" height="8" transform="rotate(45 170 22)" fill="none" stroke="${colors.text}" stroke-opacity="0.5" stroke-width="0.75" />
 
-    <text x="26" y="72" font-size="46" font-weight="800" fill="${colors.text}" font-family="'Arial Black', Arial, sans-serif">${data.overall}</text>
+    <text x="26" y="72" font-size="46" font-weight="800" fill="${colors.text}" font-family="'Arial Black', Arial, sans-serif" data-count-to="${data.overall}">${data.overall}</text>
     <text x="26" y="96" font-size="15" font-weight="700" fill="${colors.text}" opacity="0.9">${escapeXml(data.position)}</text>
 
     ${flagFragment(data.flag, 26, 110, 32, 24, colors.text)}

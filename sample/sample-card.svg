@@ -28,7 +28,7 @@
     <rect x="158" y="10" width="15" height="15" transform="rotate(45 170 22)" fill="#CD7F32" stroke="#2A1A0C" stroke-opacity="0.5" stroke-width="1" />
     <rect x="161.5" y="13.5" width="8" height="8" transform="rotate(45 170 22)" fill="none" stroke="#2A1A0C" stroke-opacity="0.5" stroke-width="0.75" />
 
-    <text x="26" y="72" font-size="46" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif">41</text>
+    <text x="26" y="72" font-size="46" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif" data-count-to="41">41</text>
     <text x="26" y="96" font-size="15" font-weight="700" fill="#2A1A0C" opacity="0.9">CDM</text>
 
     
@@ -65,22 +65,22 @@
     <line x1="30" y1="405" x2="310" y2="405" stroke="#2A1A0C" stroke-opacity="0.18" stroke-width="1" />
 
     
-    <text x="42" y="360" font-size="19" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif">51</text>
+    <text x="42" y="360" font-size="19" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif" data-count-to="51">51</text>
     <text x="74" y="360" font-size="13" font-weight="700" fill="#2A1A0C" font-family="Arial, sans-serif" opacity="0.85">PAC</text>
 
-    <text x="42" y="390" font-size="19" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif">45</text>
+    <text x="42" y="390" font-size="19" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif" data-count-to="45">45</text>
     <text x="74" y="390" font-size="13" font-weight="700" fill="#2A1A0C" font-family="Arial, sans-serif" opacity="0.85">SHO</text>
 
-    <text x="42" y="420" font-size="19" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif">17</text>
+    <text x="42" y="420" font-size="19" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif" data-count-to="17">17</text>
     <text x="74" y="420" font-size="13" font-weight="700" fill="#2A1A0C" font-family="Arial, sans-serif" opacity="0.85">PAS</text>
     
-    <text x="192" y="360" font-size="19" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif">41</text>
+    <text x="192" y="360" font-size="19" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif" data-count-to="41">41</text>
     <text x="224" y="360" font-size="13" font-weight="700" fill="#2A1A0C" font-family="Arial, sans-serif" opacity="0.85">DRI</text>
 
-    <text x="192" y="390" font-size="19" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif">18</text>
+    <text x="192" y="390" font-size="19" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif" data-count-to="18">18</text>
     <text x="224" y="390" font-size="13" font-weight="700" fill="#2A1A0C" font-family="Arial, sans-serif" opacity="0.85">DEF</text>
 
-    <text x="192" y="420" font-size="19" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif">74</text>
+    <text x="192" y="420" font-size="19" font-weight="800" fill="#2A1A0C" font-family="'Arial Black', Arial, sans-serif" data-count-to="74">74</text>
     <text x="224" y="420" font-size="13" font-weight="700" fill="#2A1A0C" font-family="Arial, sans-serif" opacity="0.85">PHY</text>
   </g>
 </svg>

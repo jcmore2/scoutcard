@@ -1,7 +1,8 @@
 import { tierColors } from "../src/scoring.js";
 import { SHIELD_PATH } from "../src/renderCard.js";
 import { GOLD_BORDER, BORDER_EDGE, PAPER, INK, TCG_FONT } from "../src/renderCardTcg.js";
-import { STAT_DESCRIPTIONS, TIER_BANDS } from "../src/statDescriptions.js";
+import { BB_CREAM, BB_INK, BB_FONT } from "../src/renderBaseball.js";
+import { STAT_DESCRIPTIONS, TIER_BANDS, SCORING_VERSION } from "../src/statDescriptions.js";
 import type { CardData, CardStyle, Stats } from "../src/types.js";
 
 const STAT_ORDER: (keyof Stats)[] = ["pac", "sho", "pas", "dri", "def", "phy"];
@@ -26,12 +27,17 @@ function backContentHtml(data: CardData): string {
       </li>`,
   ).join("");
 
+  const profileLink = data.profileUrl
+    ? `<a class="back-link" href="${escapeHtml(data.profileUrl)}" target="_blank" rel="noopener">${escapeHtml(data.profileUrl.replace(/^https?:\/\//, ""))}</a>`
+    : "";
+
   return `
     <div class="back-title">Scout Report</div>
-    <div class="back-mode">Source: ${modeLabel}</div>
+    <div class="back-mode">Source: ${modeLabel} · Scoring ${SCORING_VERSION}</div>
     <div class="back-tiers">${tierRow}</div>
     <ul class="back-stats">${statRows}</ul>
     <div class="back-note">Formulas are early estimates, not calibrated against real profiles yet.</div>
+    ${profileLink}
     <div class="back-hint">Tap to flip back</div>`;
 }
 
@@ -77,6 +83,21 @@ function renderTcgBack(data: CardData): string {
 </svg>`;
 }
 
+// Matches the baseball front's cream cardstock and geometric sans-serif type.
+function renderBaseballBack(data: CardData): string {
+  return `<svg viewBox="0 0 340 480" xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <rect x="4" y="4" width="332" height="472" rx="14" fill="${BB_CREAM}" stroke="${BB_INK}" stroke-opacity="0.7" stroke-width="2" />
+  <rect x="14" y="14" width="312" height="452" rx="8" fill="none" stroke="${BB_INK}" stroke-opacity="0.25" stroke-width="1" />
+  <foreignObject x="14" y="14" width="312" height="452">
+    <xhtml:div class="back-face" style="color: ${BB_INK}; font-family: ${BB_FONT}; padding: 22px 22px 18px;">
+      ${backContentHtml(data)}
+    </xhtml:div>
+  </foreignObject>
+</svg>`;
+}
+
 export function renderCardBack(data: CardData, style: CardStyle): string {
-  return style === "tcg" ? renderTcgBack(data) : renderFutBack(data);
+  if (style === "tcg") return renderTcgBack(data);
+  if (style === "baseball") return renderBaseballBack(data);
+  return renderFutBack(data);
 }

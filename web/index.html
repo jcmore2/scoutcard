@@ -27,6 +27,23 @@
         <p class="privacy-inline">🔒 Totally private — your file never leaves your device.</p>
 
         <section id="panel-scout">
+          <div class="walkthrough" aria-hidden="true">
+            <div class="walkthrough-step">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" /></svg>
+              <span>Profile</span>
+            </div>
+            <svg class="walkthrough-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            <div class="walkthrough-step">
+              <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg>
+              <span>"More"</span>
+            </div>
+            <svg class="walkthrough-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            <div class="walkthrough-step">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2h9l5 5v15H6z" /><path d="M14 2v6h6" /></svg>
+              <span>Save to PDF</span>
+            </div>
+          </div>
+
           <section class="steps">
             <ol>
               <li>
@@ -40,19 +57,23 @@
 
           <section class="uploader">
             <label for="pdf-input" id="pdf-drop-zone" class="drop-zone">
-              <span id="pdf-drop-label">Drop a "Save to PDF" profile export here, or click to choose a file</span>
+              <span id="pdf-drop-label">Drop a "Save to PDF" profile export here, or tap to choose a file</span>
               <input id="pdf-input" type="file" accept=".pdf" />
             </label>
           </section>
         </section>
       </section>
 
-      <p id="status" role="status"></p>
+      <div class="status-row">
+        <div class="spinner" id="spinner" hidden aria-hidden="true"></div>
+        <p id="status" role="status" aria-live="polite"></p>
+      </div>
 
       <section id="result" hidden>
         <div class="tabs style-tabs" role="tablist">
           <button class="tab active" id="style-fut" role="tab" aria-selected="true">FIFA style</button>
           <button class="tab" id="style-tcg" role="tab" aria-selected="false">Pokémon style</button>
+          <button class="tab" id="style-baseball" role="tab" aria-selected="false">Baseball style</button>
         </div>
 
         <div id="card-flip" class="card-flip" role="button" tabindex="0" aria-label="Flip card to see what the score means">
@@ -66,6 +87,11 @@
         <div class="actions">
           <button id="download-btn">Download card.svg</button>
           <button id="new-card-btn" class="secondary">Open a new pack</button>
+        </div>
+        <div class="share-row">
+          <span class="share-label">Share:</span>
+          <button id="share-x" class="share-btn" aria-label="Share on X">𝕏</button>
+          <button id="share-linkedin" class="share-btn" aria-label="Share on LinkedIn">in</button>
         </div>
       </section>
 
