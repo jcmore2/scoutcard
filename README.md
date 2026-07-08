@@ -1,34 +1,28 @@
 # ScoutCard
 
-Turn your work history into a collectible stat card — an MVP exploring
-whether this can be done using **only GitHub as infrastructure** (no server,
-no database, no hosting bill).
+Turn your work history into a collectible stat card, FIFA/FUT-style — built
+as an MVP exploring whether this can run on **just GitHub as infrastructure**
+(no server, no database, no hosting bill).
+
+**[Try it → jcmore2.github.io/scoutcard](https://jcmore2.github.io/scoutcard/)**
+— drop a LinkedIn "Save to PDF" export, get a card instantly, nothing ever
+leaves your browser.
 
 This is a companion experiment to [GitFut](https://github.com/Younesfdj/gitfut),
-which does the same thing for GitHub profiles. GitHub has a free public API
-GitFut can query live; LinkedIn does not expose one for arbitrary profiles, so
-this project works from **your own official data export**, or **any public
-profile's "Save to PDF" export**, instead of scraping.
+which does the same thing for GitHub profiles. GitFut can query GitHub's free
+public API live for anyone; LinkedIn exposes no such API, so ScoutCard works
+from **your own official data export**, or **any public profile's "Save to
+PDF" export**, instead of scraping.
 
-## Why "just GitHub" infra
+## What it does
 
-GitFut runs on Vercel + a self-hosted Redis instance to serve a dynamic
-`username.png` on demand. GitHub alone (Actions + a repo + raw file serving)
-can't do on-demand dynamic rendering for arbitrary input — there's no
-always-on server. What it *can* do is: you generate a static SVG file
-locally, commit it, and it's instantly servable at a permanent URL:
-
-```
-https://raw.githubusercontent.com/<you>/<repo>/main/<path-to-card>.svg
-```
-
-"Self-updating" here means "re-run the generator and push" rather than
-"recomputed live per visitor." No Vercel, no Redis, no cost.
+Feed it LinkedIn data and it scores six FIFA-style stats (PAC/SHO/PAS/DRI/DEF/PHY),
+an overall rating, a rarity tier (Bronze → Icon), and a scouted position +
+archetype (e.g. `ST` / "Poacher") — then renders the result as an SVG stat
+card in one of three visual styles. The card is a flat, shareable file: embed
+it in a GitHub README, download it, or view it live in the web app.
 
 ## Two ways to scout a profile
-
-There are two independent input modes — same card format, different data
-source, different tradeoffs.
 
 | | **Full export** (`.zip`) | **Scout** (`.pdf`) |
 |---|---|---|
@@ -38,85 +32,74 @@ source, different tradeoffs.
 | Card badge | `FULL EXPORT` | `PDF SCOUT` |
 | Available in | CLI only | CLI and the web app |
 
-The PDF/Scout mode is the one that's actually comparable to GitFut's "look up
-anyone" experience — LinkedIn has no public API for that, but "Save to PDF"
-is a real, always-available profile-page feature, not scraping. It just has
-much thinner signals, so it uses a **separate scoring formula** ([src/pdf/scoringPdf.ts](src/pdf/scoringPdf.ts))
-rather than forcing PDF data into the full-export formula. It's also the
-only mode the web app offers — the full-export flow needs your own account
-data, which doesn't add much for a public drop-a-file-and-go tool, so it's
-CLI-only to keep the web experience to one clear path.
+Scout mode is the one comparable to GitFut's "look up anyone" experience —
+LinkedIn has no public API for that, but "Save to PDF" is a real,
+always-available profile-page feature, not scraping. Its signals are much
+thinner, so it uses a **separate scoring formula**
+([src/pdf/scoringPdf.ts](src/pdf/scoringPdf.ts)) rather than forcing PDF data
+into the full-export formula. It's also the only mode the web app offers —
+the full-export flow needs your own account data, which doesn't add much for
+a public drop-a-file-and-go tool, so that path stays CLI-only.
 
 **Use this respectfully** — being able to view someone's public profile
 doesn't mean turning it into a stat card is something they'd expect or want.
 Prefer scouting your own profile, or get a person's OK before generating a
 card of theirs.
 
-## Web app (no install required)
+## Web app
 
-**[jcmore2.github.io/scoutcard](https://jcmore2.github.io/scoutcard/)**
-— drop a "Save to PDF" export, get your card instantly. It's a static page
-(built by GitHub Actions, hosted on GitHub Pages) that parses everything
-client-side with JavaScript — nothing is ever uploaded anywhere, not even to
-this project. Close the tab and the data is gone. Once a card is generated,
-the upload screen tucks itself away behind the result — hit **"Open a new
-pack"** to scout another profile. Click "Download card.svg" to save the
-result and embed/commit it yourself.
+Drop a "Save to PDF" export onto **[jcmore2.github.io/scoutcard](https://jcmore2.github.io/scoutcard/)**.
+It's a static page (built by GitHub Actions, hosted on GitHub Pages) that
+parses everything client-side — nothing is ever uploaded anywhere, not even
+to this project. Close the tab and the data is gone.
 
-Tap the card to flip it and see what each stat is measuring and what the
-tier bands mean. The back matches whichever front style is active — same
-shield silhouette and gradient for FIFA/FUT, same gold border and parchment
-for the trading-card style ([web/cardBack.ts](web/cardBack.ts) reuses the
-exact shape/palette constants the fronts export, via an SVG `foreignObject`
-so the stat list can still be laid out with regular HTML/CSS). This is a
-web-app-only feature — the embeddable `card.svg` file (front side only) is a
-static image, so it can't be interactive inside a GitHub README `<img>`.
+- **Flip the card** to see what each stat measures and what the tier bands
+  mean. The back matches whichever front style is active
+  ([web/cardBack.ts](web/cardBack.ts) reuses the fronts' shape/palette
+  constants via an SVG `foreignObject`, so the stat list can still be laid
+  out with regular HTML/CSS). This is web-app-only — the embeddable
+  `card.svg` (front side only) is a static image.
+- **Switch styles** — the same scored data re-renders instantly, no
+  re-upload needed:
+  - **FIFA/FUT** ([src/renderCard.ts](src/renderCard.ts)) — shield silhouette, all 6 stats on the front.
+  - **Trading-card-game** ([src/renderCardTcg.ts](src/renderCardTcg.ts)) — each stat reads as an "attack" with its own energy-type color.
+  - **Baseball** ([src/renderBaseball.ts](src/renderBaseball.ts)) — classic sports-card split: front is just identity (photo, name, team, one headline stat), full 6-stat breakdown lives on the back.
 
-There's also a **card style switcher** with three options — the same scored
-data re-renders instantly, no re-upload needed:
-
-- **FIFA/FUT** ([src/renderCard.ts](src/renderCard.ts)) — shield silhouette, all 6 stats on the front.
-- **Trading-card-game** ([src/renderCardTcg.ts](src/renderCardTcg.ts)) — each stat reads as an "attack" with its own energy-type color.
-- **Baseball** ([src/renderBaseball.ts](src/renderBaseball.ts)) — a classic sports-card layout: the front is just identity (photo, name, team, one headline stat), the full 6-stat breakdown lives on the back, the way real player cards split the two.
-
-All three are original layouts inspired by those card formats, not any
-officially licensed card set, and say so on the card itself. Numbers count
-up from 0 when a card first appears or you switch styles — the SVG you
-download always shows the real value immediately, the count-up is a
-browser-only touch.
-
-A few smaller touches round out the web app: a spinner while the PDF is
-being parsed, a clearer error box (with an icon and a concrete next step) if
-the file isn't a valid "Save to PDF" export, an icon-based walkthrough of
-where "Save to PDF" actually lives on a profile page, and share buttons for
-X/LinkedIn (these link to the site itself, not a specific card — see
-**Limitations** below for why there's no per-card shareable URL).
+  All three are original layouts inspired by those formats, not any
+  officially licensed card set, and say so on the card itself. Stat numbers
+  count up from 0 on first render or style switch — a browser-only touch;
+  downloaded SVGs always show the real value immediately.
+- **Everything else**: a spinner while the PDF parses, a clear error box (icon
+  + concrete next step) for an invalid file, an icon-based walkthrough of
+  where "Save to PDF" lives on a profile page, and X/LinkedIn share buttons
+  that link to the site itself (see **Limitations** for why there's no
+  per-card shareable URL). Once a card is generated, hit **"Open a new
+  pack"** to scout another profile, or **"Download card.svg"** to keep the
+  result.
 
 ## Flag and company, but no photo or logo
 
-The card shows a real country flag and the current employer's name, both
+The card shows a real country flag and current employer name, both
 extracted straight from the profile — no manual input. The flag comes from
 guessing a country out of the profile's free-text location line
 ([src/country.ts](src/country.ts)): a known country name, a capital city
-("Madrid y alrededores" → Spain, since Madrid is its capital), a handful of
-major non-capital hubs ("San Francisco Bay Area" → US), or a trailing US
-state abbreviation, in that order — falling back to no flag rather than
-guessing wrong. Flags themselves are bundled locally ([web/public/flags](web/public/flags),
-from the [flag-icons](https://github.com/lipis/flag-icons) project) and
-fetched from this site itself — never a third-party request.
+("Madrid y alrededores" → Spain), a handful of major non-capital hubs
+("San Francisco Bay Area" → US), or a trailing US state abbreviation, in that
+order — falling back to no flag rather than guessing wrong. Flags are
+bundled locally ([web/public/flags](web/public/flags), from the
+[flag-icons](https://github.com/lipis/flag-icons) project) and served from
+this site itself — never a third-party request.
 
 There's deliberately no profile photo or company logo. Neither the data
-export nor the "Save to PDF" export contains an image (verified directly —
-scanning a real "Save to PDF" file's embedded objects turns up zero images),
-and the only way to get a real logo would be guessing a company's domain and
-fetching it from a third-party logo API, which would leak the company name
-over the network — a real conflict with "nothing ever leaves your browser."
-The initials avatar placeholder stays as-is.
+export nor the "Save to PDF" export contains an image, and the only way to
+get a real logo would be guessing a company's domain and fetching it from a
+third-party logo API — leaking the company name over the network, which
+conflicts with "nothing ever leaves your browser." The initials avatar
+placeholder stays as-is.
 
-The card back also links to the profile's own `linkedin.com/in/...` URL when
-the PDF export includes one (under its Contact section) — a plain link
-rather than a QR code, to avoid pulling in a QR-encoding dependency for a
-nice-to-have.
+The card back links to the profile's own `linkedin.com/in/...` URL when the
+PDF export includes one — a plain link rather than a QR code, to avoid a
+QR-encoding dependency for a nice-to-have.
 
 ## CLI (generates a card you commit to this repo)
 
@@ -157,7 +140,7 @@ Either way:
    ![My ScoutCard](https://raw.githubusercontent.com/<you>/<repo>/main/card.svg)
    ```
 
-## Try it without your own data
+### Try it without your own data
 
 A fake sample export is included so you can see the pipeline work end to end:
 
@@ -167,7 +150,7 @@ npm run build:sample     # writes sample/sample-export.zip (fake data)
 npm run generate:sample  # writes sample/sample-card.svg
 ```
 
-## Stat mapping
+## Scoring
 
 **Full export** ([src/scoring.ts](src/scoring.ts)):
 
@@ -191,23 +174,6 @@ npm run generate:sample  # writes sample/sample-card.svg
 | **DEF** | Education entries |
 | **PHY** | Career span (years since earliest role) |
 
-## Position and archetype
-
-Every card also gets a **position** and **archetype** label (e.g. `ST` /
-"Poacher"), the same idea as GitFut's "shooting spike scouts a poacher"
-logic: whichever of the six stats scores highest picks both, via one shared
-mapping ([src/scoring.ts](src/scoring.ts)) used by both the full-export and
-Scout/PDF formulas:
-
-| Top stat | Position | Archetype |
-|:--:|:--:|:--|
-| PAC | RW | Sprinter |
-| SHO | ST | Poacher |
-| PAS | CAM | Playmaker |
-| DRI | CM | Generalist |
-| DEF | CB | Anchor |
-| PHY | CDM | Veteran |
-
 Raw stats cap at 88, same "legacy gate" idea as GitFut — one good year
 shouldn't crown you an Icon. **These formulas are initial guesses, not
 calibrated against a real distribution of profiles** — expect numbers to feel
@@ -221,9 +187,26 @@ section headers (LinkedIn renders "Save to PDF" in whatever language the
 *viewer's* UI is set to, not the profile owner's) — other languages degrade
 gracefully to a 0 for that section rather than crashing.
 
-Each card also shows a **scoring version** ("Scoring v1") on the back —
-bumped whenever a formula changes, so a card shared under an older formula
-stays self-explanatory instead of silently meaning something different.
+Each card shows a **scoring version** ("Scoring v1") on the back — bumped
+whenever a formula changes, so a card shared under an older formula stays
+self-explanatory instead of silently meaning something different.
+
+### Position and archetype
+
+Every card also gets a **position** and **archetype** label (e.g. `ST` /
+"Poacher") — the same idea as GitFut's "shooting spike scouts a poacher"
+logic: whichever of the six stats scores highest picks both, via one shared
+mapping ([src/scoring.ts](src/scoring.ts)) used by both the full-export and
+Scout/PDF formulas:
+
+| Top stat | Position | Archetype |
+|:--:|:--:|:--|
+| PAC | RW | Sprinter |
+| SHO | ST | Poacher |
+| PAS | CAM | Playmaker |
+| DRI | CM | Generalist |
+| DEF | CB | Anchor |
+| PHY | CDM | Veteran |
 
 ## Privacy
 
@@ -231,6 +214,21 @@ A full data export contains other people's data too (connections' names,
 companies, who endorsed you). This repo's `.gitignore` blocks committing any
 `.zip`/`.pdf` export or a `/private/` folder — only the generated card (which
 shows just aggregated stats) is meant to be committed and public.
+
+## Why "just GitHub" infra
+
+GitFut runs on Vercel + a self-hosted Redis instance to serve a dynamic
+`username.png` on demand. GitHub alone (Actions + a repo + raw file serving)
+can't do on-demand dynamic rendering for arbitrary input — there's no
+always-on server. What it *can* do is: generate a static SVG file locally,
+commit it, and it's instantly servable at a permanent URL:
+
+```
+https://raw.githubusercontent.com/<you>/<repo>/main/<path-to-card>.svg
+```
+
+"Self-updating" here means "re-run the generator and push" rather than
+"recomputed live per visitor." No Vercel, no Redis, no cost.
 
 ## Limitations of the "just GitHub" approach
 
@@ -250,3 +248,6 @@ npm install
 npm run dev:web    # http://localhost:5173, hot reload
 npm run build:web  # production build to web/dist, what CI deploys
 ```
+
+`web/dist` is what [.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml)
+builds and publishes to GitHub Pages on every push to `main`.
