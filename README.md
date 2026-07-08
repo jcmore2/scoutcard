@@ -72,10 +72,9 @@ to this project. Close the tab and the data is gone.
 - **Everything else**: a spinner while the PDF parses, a clear error box (icon
   + concrete next step) for an invalid file, an icon-based walkthrough of
   where "Save to PDF" lives on a profile page, and X/LinkedIn share buttons
-  that link to the site itself (see **Limitations** for why there's no
-  per-card shareable URL). Once a card is generated, hit **"Open a new
-  pack"** to scout another profile, or **"Download card.svg"** to keep the
-  result.
+  that link to the site itself, since there's no shareable URL for an
+  individual card. Once a card is generated, hit **"Open a new pack"** to
+  scout another profile, or **"Download card.svg"** to keep the result.
 
 ## Flag and company, but no photo or logo
 
@@ -214,32 +213,6 @@ A full data export contains other people's data too (connections' names,
 companies, who endorsed you). This repo's `.gitignore` blocks committing any
 `.zip`/`.pdf` export or a `/private/` folder — only the generated card (which
 shows just aggregated stats) is meant to be committed and public.
-
-## Why "just GitHub" infra
-
-GitFut runs on Vercel + a self-hosted Redis instance to serve a dynamic
-`username.png` on demand. GitHub alone (Actions + a repo + raw file serving)
-can't do on-demand dynamic rendering for arbitrary input — there's no
-always-on server. What it *can* do is: generate a static SVG file locally,
-commit it, and it's instantly servable at a permanent URL:
-
-```
-https://raw.githubusercontent.com/<you>/<repo>/main/<path-to-card>.svg
-```
-
-"Self-updating" here means "re-run the generator and push" rather than
-"recomputed live per visitor." No Vercel, no Redis, no cost.
-
-## Limitations of the "just GitHub" approach
-
-- No arbitrary-username lookup like `gitfut.com/<anyone>` — this only ever
-  works from a data export the profile owner uploads themselves, since
-  LinkedIn has no public API for looking up other people's profiles.
-- The web app renders the card live per visit, but nothing is stored —
-  there's no shareable `scoutcard.../jcmore2` URL. Persisting a card at a
-  permanent URL still means downloading it and committing it yourself (the
-  CLI path above), since there's no backend to save it for you.
-- Scoring constants are unvalidated placeholders (see above).
 
 ## Local development
 
