@@ -8,7 +8,7 @@ import { guessCountryCode } from "../src/country.js";
 import { renderCardStyled } from "../src/renderCardStyled.js";
 import { renderCardBack } from "./cardBack.js";
 import { initHeroShowcase } from "./heroShowcase.js";
-import type { CardData, CardStyle } from "../src/types.js";
+import type { CardData, CardStyle, Tier } from "../src/types.js";
 
 const SITE_URL = "https://jcmore2.github.io/scoutcard/";
 
@@ -37,6 +37,15 @@ const styleButtons: Record<CardStyle, HTMLButtonElement> = {
   baseball: styleBaseballBtn,
 };
 
+// "IN-FORM" is a defined tier color but never produced by computeTier —
+// left out of the gallery since it can't actually happen to a real card.
+const GALLERY_TIERS: Tier[] = ["BRONZE", "SILVER", "GOLD", "TOTY", "ICON"];
+const GALLERY_STYLES: { key: CardStyle; label: string }[] = [
+  { key: "fut", label: "FIFA" },
+  { key: "tcg", label: "Pokémon" },
+  { key: "baseball", label: "Baseball" },
+];
+
 const spinner = document.getElementById("spinner") as HTMLDivElement;
 const statusEl = document.getElementById("status") as HTMLParagraphElement;
 const resultEl = document.getElementById("result") as HTMLElement;
@@ -49,6 +58,11 @@ const newCardBtn = document.getElementById("new-card-btn") as HTMLButtonElement;
 const shareLinkedInBtn = document.getElementById("share-linkedin") as HTMLButtonElement;
 const shareInstagramBtn = document.getElementById("share-instagram") as HTMLButtonElement;
 const shareTiktokBtn = document.getElementById("share-tiktok") as HTMLButtonElement;
+
+const galleryEl = document.getElementById("gallery") as HTMLElement;
+const galleryGrid = document.getElementById("gallery-grid") as HTMLDivElement;
+const galleryBtn = document.getElementById("gallery-btn") as HTMLButtonElement;
+const galleryBackBtn = document.getElementById("gallery-back-btn") as HTMLButtonElement;
 
 let currentSvg = "";
 let currentCardData: CardData | null = null;
@@ -144,6 +158,7 @@ function resetPhotoUploader() {
 
 function resetToSetup() {
   resultEl.hidden = true;
+  galleryEl.hidden = true;
   setupPanel.hidden = false;
   currentCardData = null;
   pdfInput.value = "";
@@ -153,6 +168,32 @@ function resetToSetup() {
 }
 
 newCardBtn.addEventListener("click", resetToSetup);
+
+// Re-renders the same name/photo/stats under every tier and style, purely
+// for browsing the designs — the tier shown here is never the real one
+// unless it happens to match, since tier is derived from the actual score,
+// not picked. Built lazily (only when opened) since it's 15 SVGs.
+function buildGalleryGrid(data: CardData) {
+  galleryGrid.innerHTML = GALLERY_TIERS.map((tier) => {
+    const cells = GALLERY_STYLES.map(({ key, label }) => {
+      const svg = renderCardStyled({ ...data, tier }, key);
+      return `<div class="gallery-cell">${svg}<span class="gallery-cell-label">${label}</span></div>`;
+    }).join("");
+    return `<div class="gallery-row"><span class="gallery-row-label">${tier}</span><div class="gallery-row-cards">${cells}</div></div>`;
+  }).join("");
+}
+
+galleryBtn.addEventListener("click", () => {
+  if (!currentCardData) return;
+  buildGalleryGrid(currentCardData);
+  resultEl.hidden = true;
+  galleryEl.hidden = false;
+});
+
+galleryBackBtn.addEventListener("click", () => {
+  galleryEl.hidden = true;
+  resultEl.hidden = false;
+});
 
 function toggleFlip() {
   cardFlipInner.classList.add("squeezed");
