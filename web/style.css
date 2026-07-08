@@ -665,3 +665,22 @@ footer a:hover {
 .bmc-btn-icon {
   font-size: 1.1rem;
 }
+
+.bmc-corner {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 480px) {
+  .bmc-corner {
+    padding: 8px 10px;
+  }
+
+  .bmc-corner-label {
+    display: none;
+  }
+}
