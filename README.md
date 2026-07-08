@@ -214,14 +214,29 @@ gets a couple of sparkle accents of its own as the step up from the plain
 Bronze/Silver look.
 
 The FIFA/FUT style goes further, modeled on official FUT card types
-([src/tierBackgrounds.ts](src/tierBackgrounds.ts)): Bronze gets a "Common"
-dot-stipple texture; Silver and Gold get "Rare"'s dots plus diagonal
-brushstroke bands, recolored per tier the way a real Rare card exists at
-every color; TOTY gets its own fixed "In-Form" identity — a black + gold
-background with a bold diagonal streak and scattered star-dust — regardless
-of the underlying tier gradient; and Icon gets a white/gold "Icon" look with
-marble veining, a gold streak, a glowing border, extra sparkles, and a
-laurel wreath framing the photo.
+([src/tierBackgrounds.ts](src/tierBackgrounds.ts)) — differing in shape and
+frame, not just color and background art:
+
+- The shield itself has a small peaked notch at the top center (flanked by
+  two shoulder dips) that the crest emblem sits on, rather than a flat top.
+- Every tier gets a thick, solid-color border band — the whole card face
+  (background, texture, sheen, photo, stats) is scaled down into a bordered
+  inset via a single shared transform, instead of a thin stroke around a
+  full-bleed fill.
+- The crest emblem itself changes with tier identity: Bronze/Silver/Gold
+  keep a plain laurel + ball; TOTY swaps it for a spiky rated-seal burst;
+  Icon gets a bigger laurel around a gem.
+- Bronze gets a "Common" dot-stipple texture; Silver and Gold get "Rare"'s
+  dots plus diagonal brushstroke bands, recolored per tier the way a real
+  Rare card exists at every color; TOTY gets its own fixed "In-Form"
+  identity — a black + gold background with a bold diagonal streak and
+  scattered star-dust — regardless of the underlying tier gradient; and Icon
+  gets a white/gold look with marble veining, a gold streak, extra sparkles,
+  and a laurel wreath framing the photo.
+- Icon is also the only tier with a **structurally** different frame: a
+  second thin accent ring between the border band and the face — a
+  "double-lined" border, not just an extra glow — so it reads as a
+  genuinely different class of card at a glance, the way real Icon cards do.
 
 The PDF parser recognizes English, Spanish, French, German, and Portuguese
 section headers (LinkedIn renders "Save to PDF" in whatever language the

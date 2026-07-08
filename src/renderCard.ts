@@ -14,14 +14,15 @@ const STAT_LABELS: [key: keyof CardData["stats"], label: string][] = [
   ["phy", "PHY"],
 ];
 
-// A shield/pentagon silhouette (flat wide top, straight sides, tapering to
-// a point at the bottom) rather than a plain rounded rectangle — the shape
-// sports-card-style ratings cards use. The taper only kicks in near the
+// A shield/crest silhouette (a small peaked notch at top center flanked by
+// two shoulder dips, straight sides, tapering to a point at the bottom)
+// rather than a plain flat-topped rectangle — the shape real rating cards
+// use, and what the crest emblem sits on. The taper only kicks in near the
 // bottom so the stat grid still gets the full card width. Exported so the
 // interactive card-back view (web/cardBack.ts) can clip to the identical
 // shape instead of drifting into a plain rectangle.
 export const SHIELD_PATH =
-  "M 34 6 L 306 6 Q 334 6 334 34 L 334 396 Q 334 414 320 424 L 316 428 L 194 468 Q 170 480 146 468 L 24 428 L 20 424 Q 6 414 6 396 L 6 34 Q 6 6 34 6 Z";
+  "M 34 6 L 145 6 L 155 15 L 170 2 L 185 15 L 195 6 L 306 6 Q 334 6 334 34 L 334 396 Q 334 414 320 424 L 316 428 L 194 468 Q 170 480 146 468 L 24 428 L 20 424 Q 6 414 6 396 L 6 34 Q 6 6 34 6 Z";
 
 // Real names never wrap to 2 lines on this style — the font auto-shrinks to
 // fit one line instead. Rough width estimate for a bold condensed face.
@@ -95,6 +96,38 @@ export function renderCard(data: CardData): string {
     <text x="${x}" y="${y}" font-size="19" font-weight="800" fill="${colors.text}" font-family="'Arial Black', Arial, sans-serif" data-count-to="${data.stats[key]}">${data.stats[key]}</text>
     <text x="${x + 32}" y="${y}" font-size="13" font-weight="700" fill="${colors.text}" font-family="Arial, sans-serif" opacity="0.85">${label}</text>`;
 
+  // A thick solid-color border band (real rating cards' frame is chunky,
+  // not a hairline) rather than a thin stroke: the outer shield is filled
+  // with the border color, then the whole face — background, texture,
+  // sheen, and every content element below — is scaled down into a bordered
+  // inset via one shared transform, so nothing inside had to be
+  // repositioned by hand.
+  const faceScale = 0.9;
+  const faceTransform = `translate(170 240) scale(${faceScale}) translate(-170 -240)`;
+
+  // Icon gets a structurally different frame, not just an extra glow —
+  // a second thin accent ring between the border band and the face, the
+  // "double-lined" look official Icon cards use to read as a different
+  // class of card at a glance.
+  const iconDoubleRing =
+    level === 4
+      ? `<path d="${SHIELD_PATH}" fill="none" stroke="#ffffff" stroke-opacity="0.75" stroke-width="1.5" transform="translate(170 240) scale(0.955) translate(-170 -240)" />`
+      : "";
+
+  // The crest emblem varies with tier identity rather than just scaling a
+  // laurel up: Common/Rare (Bronze/Silver/Gold) keep a plain laurel + ball,
+  // In-Form (TOTY) swaps it for a spiky rated-seal burst matching its
+  // jagged energy, and Icon gets a bigger laurel around a gem instead of a
+  // plain circle.
+  const totyBurst =
+    "M 170 3 L 176 13.8 L 188 15.5 L 179.5 24 L 181.5 36 L 170 30.5 L 158.5 36 L 160.5 24 L 152 15.5 L 164 13.8 Z";
+  const crest =
+    data.tier === "TOTY"
+      ? `<path d="${totyBurst}" fill="${colors.from}" stroke="${colors.text}" stroke-opacity="0.6" stroke-width="1" /><circle cx="170" cy="19" r="6" fill="${colors.to}" stroke="${colors.text}" stroke-opacity="0.6" stroke-width="1" />`
+      : data.tier === "ICON"
+        ? `${laurelBranch(170, 18, 19, 95, 195, 4, colors.text)}${laurelBranch(170, 18, 19, 85, -15, 4, colors.text)}<rect x="164" y="10" width="12" height="12" transform="rotate(45 170 16)" fill="${colors.from}" stroke="${colors.text}" stroke-opacity="0.6" stroke-width="1" />`
+        : `${laurelBranch(170, 20, 15, 100, 190, 3, colors.text)}${laurelBranch(170, 20, 15, 80, -10, 3, colors.text)}<circle cx="170" cy="20" r="5" fill="${colors.from}" stroke="${colors.text}" stroke-opacity="0.6" stroke-width="1" />`;
+
   return `<svg viewBox="0 0 340 480" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
   <defs>
     <linearGradient id="cardBg${rid}" x1="0" y1="0" x2="1" y2="1">
@@ -117,23 +150,20 @@ export function renderCard(data: CardData): string {
       ? `<path d="${SHIELD_PATH}" fill="none" stroke="#fff6d8" stroke-opacity="0.35" stroke-width="10" transform="translate(170 240) scale(1.045) translate(-170 -240)" />`
       : ""
   }
-  ${
-    level >= 3
-      ? `<path d="${SHIELD_PATH}" fill="none" stroke="${colors.from}" stroke-opacity="0.85" stroke-width="1.5" transform="translate(170 240) scale(1.02) translate(-170 -240)" />`
-      : ""
-  }
-  <path d="${SHIELD_PATH}" fill="url(#cardBg${rid})" stroke="${colors.text}" stroke-opacity="0.4" stroke-width="3" />
-  <path d="${SHIELD_PATH}" fill="none" stroke="${colors.text}" stroke-opacity="0.25" stroke-width="1" transform="translate(170 240) scale(0.965) translate(-170 -240)" />
-  ${dotPatternId ? `<path d="${SHIELD_PATH}" fill="url(#${dotPatternId})" />` : ""}
-  <path d="${SHIELD_PATH}" fill="url(#cardSheen${rid})" />
+  <path d="${SHIELD_PATH}" fill="${colors.from}" stroke="${colors.text}" stroke-opacity="0.4" stroke-width="2" />
+  ${iconDoubleRing}
 
-  <g clip-path="url(#shieldClip${rid})">
+  <g transform="${faceTransform}">
+    <path d="${SHIELD_PATH}" fill="url(#cardBg${rid})" />
+    <path d="${SHIELD_PATH}" fill="none" stroke="${colors.text}" stroke-opacity="0.25" stroke-width="1" transform="translate(170 240) scale(0.965) translate(-170 -240)" />
+    ${dotPatternId ? `<path d="${SHIELD_PATH}" fill="url(#${dotPatternId})" />` : ""}
+    <path d="${SHIELD_PATH}" fill="url(#cardSheen${rid})" />
+
+    <g clip-path="url(#shieldClip${rid})">
     ${backgroundStrokes}
     <text x="170" y="270" font-size="240" font-weight="800" fill="${colors.text}" fill-opacity="0.08" text-anchor="middle" font-family="'Arial Black', Arial, sans-serif">${data.overall}</text>
 
-    ${laurelBranch(170, 20, 15, 100, 190, 3, colors.text)}
-    ${laurelBranch(170, 20, 15, 80, -10, 3, colors.text)}
-    <circle cx="170" cy="20" r="5" fill="${colors.from}" stroke="${colors.text}" stroke-opacity="0.6" stroke-width="1" />
+    ${crest}
 
     <text x="26" y="72" font-size="46" font-weight="800" fill="${colors.text}" font-family="'Arial Black', Arial, sans-serif" data-count-to="${data.overall}">${data.overall}</text>
     <text x="26" y="96" font-size="15" font-weight="700" fill="${colors.text}" opacity="0.9">${escapeXml(data.position)}</text>
@@ -186,6 +216,7 @@ export function renderCard(data: CardData): string {
 
     ${leftStats.map((s, i) => statRow(s, 42, 360 + i * 30)).join("\n")}
     ${rightStats.map((s, i) => statRow(s, 192, 360 + i * 30)).join("\n")}
+    </g>
   </g>
 </svg>`;
 }
