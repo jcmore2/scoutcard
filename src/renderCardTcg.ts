@@ -1,6 +1,7 @@
 import type { CardData, Stats } from "./types.js";
 import { tierColors } from "./scoring.js";
 import { escapeXml, initials, wrapName, nameFontSize, truncate, flagFragment } from "./cardTextUtils.js";
+import { tierLevel, sparkle, holoPatternDefs } from "./tierEffects.js";
 
 const STAT_ORDER: (keyof Stats)[] = ["pac", "sho", "pas", "dri", "def", "phy"];
 export const TCG_FONT = "'Trebuchet MS', Verdana, sans-serif";
@@ -49,6 +50,11 @@ function energyPip(cx: number, cy: number, r: number, key: keyof Stats): string 
 export function renderCardTcg(data: CardData): string {
   const colors = tierColors(data.tier);
   const weakest = lowestStat(data.stats);
+
+  // Bronze through Gold share this template — TOTY and Icon add a holo-foil
+  // finish and a brighter border so they read as a genuinely rarer pull.
+  const level = tierLevel(data.tier);
+  const tierBadgeLabel = level === 4 ? "★ ICON ★" : data.tier;
 
   const headlineMentionsCompany = data.company && data.headline.toLowerCase().includes(data.company.toLowerCase());
   const headlineCaption = data.company && !headlineMentionsCompany
@@ -122,16 +128,29 @@ export function renderCardTcg(data: CardData): string {
       <stop offset="0.68" stop-color="#ffffff" stop-opacity="0" />
       <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
     </linearGradient>
+    ${level >= 3 ? holoPatternDefs("tcgHoloFoil") : ""}
   </defs>
 
+  ${
+    level >= 4
+      ? `<rect x="4" y="4" width="332" height="472" rx="16" fill="none" stroke="#fff6d8" stroke-opacity="0.4" stroke-width="9" />`
+      : ""
+  }
+  ${
+    level >= 3
+      ? `<rect x="1.5" y="1.5" width="337" height="477" rx="18" fill="none" stroke="${colors.from}" stroke-opacity="0.9" stroke-width="1.5" />`
+      : ""
+  }
   <rect x="4" y="4" width="332" height="472" rx="16" fill="url(#tcgBorder)" stroke="${BORDER_EDGE}" stroke-width="2.5" />
   <rect x="4" y="4" width="332" height="472" rx="16" fill="url(#tcgShine)" />
+  ${level >= 3 ? `<rect x="4" y="4" width="332" height="472" rx="16" fill="url(#tcgHoloFoil)" />` : ""}
   <rect x="9" y="9" width="322" height="462" rx="13" fill="none" stroke="${BORDER_EDGE}" stroke-opacity="0.6" stroke-width="1" />
   <rect x="13" y="13" width="314" height="454" rx="11" fill="${PAPER}" />
+  ${level >= 3 ? `<rect x="13" y="13" width="314" height="454" rx="11" fill="url(#tcgHoloFoil)" opacity="0.55" />` : ""}
 
-  <rect x="21" y="${badgeY}" width="72" height="14" rx="7" fill="${colors.from}" />
-  <text x="57" y="${badgeY + 10}" font-size="8" font-weight="800" fill="${colors.text}" text-anchor="middle">${data.tier}</text>
-  ${flagFragment(data.flag, 99, badgeY, 18, 14, INK)}
+  <rect x="21" y="${badgeY}" width="${level === 4 ? 84 : 72}" height="14" rx="7" fill="${colors.from}" />
+  <text x="${level === 4 ? 63 : 57}" y="${badgeY + 10}" font-size="8" font-weight="800" fill="${colors.text}" text-anchor="middle">${tierBadgeLabel}</text>
+  ${flagFragment(data.flag, level === 4 ? 111 : 99, badgeY, 18, 14, INK)}
   <text x="319" y="${badgeY + 10}" font-size="8" font-weight="600" fill="${MUTED_INK}" text-anchor="end" font-style="italic">Sourced via ${modeLabel(data)}</text>
 
   ${nameLines
@@ -162,6 +181,8 @@ export function renderCardTcg(data: CardData): string {
   <circle cx="170" cy="${artY + artHeight / 2}" r="42" fill="#ffffff" fill-opacity="0.3" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.4" />
   <text x="170" y="${artY + artHeight / 2 + 9}" font-size="28" font-weight="800" fill="${colors.text}" text-anchor="middle">${escapeXml(initials(data.name))}</text>`
   }
+  ${level >= 2 ? sparkle(32, artY + 12, 7, "#ffffff") + sparkle(308, artY + 12, 7, "#ffffff") : ""}
+  ${level >= 4 ? sparkle(32, artY + artHeight - 12, 6, "#ffffff") + sparkle(308, artY + artHeight - 12, 6, "#ffffff") : ""}
 
   <rect x="21" y="${powerBoxY}" width="298" height="${powerBoxHeight}" rx="6" fill="none" stroke="#B79B5B" stroke-width="1" />
   <text x="28" y="${powerBoxY + 14}" font-size="11" font-weight="800" fill="#7A4B9C">Scout Power: ${escapeXml(data.archetype)}</text>

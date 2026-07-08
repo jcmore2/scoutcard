@@ -1,6 +1,7 @@
 import type { CardData } from "./types.js";
 import { tierColors } from "./scoring.js";
 import { escapeXml, initials, truncate, flagFragment } from "./cardTextUtils.js";
+import { tierLevel, sparkle, holoPatternDefs, laurelBranch } from "./tierEffects.js";
 
 const STAT_LABELS: [key: keyof CardData["stats"], label: string][] = [
   ["pac", "PAC"],
@@ -37,6 +38,15 @@ export function renderCard(data: CardData): string {
   const leftStats = STAT_LABELS.slice(0, 3);
   const rightStats = STAT_LABELS.slice(3);
 
+  // Bronze through Gold share this exact template (like real rating cards
+  // do) — TOTY and Icon layer extra effects on top so they read as a
+  // genuinely different, rarer class of card rather than just a new color.
+  const level = tierLevel(data.tier);
+  const tierLabel = level === 4 ? "★ ICON ★" : data.tier;
+  const sparklePositions: [number, number, number][] = [];
+  if (level >= 2) sparklePositions.push([100, 122, 7], [240, 122, 7]);
+  if (level >= 4) sparklePositions.push([130, 226, 6], [210, 226, 6]);
+
   const statRow = (
     [key, label]: [keyof CardData["stats"], string],
     x: number,
@@ -62,12 +72,24 @@ export function renderCard(data: CardData): string {
     <clipPath id="shieldClip">
       <path d="${SHIELD_PATH}" />
     </clipPath>
+    ${level >= 3 ? holoPatternDefs("holoFoil") : ""}
   </defs>
 
+  ${
+    level >= 4
+      ? `<path d="${SHIELD_PATH}" fill="none" stroke="#fff6d8" stroke-opacity="0.35" stroke-width="10" transform="translate(170 240) scale(1.045) translate(-170 -240)" />`
+      : ""
+  }
+  ${
+    level >= 3
+      ? `<path d="${SHIELD_PATH}" fill="none" stroke="${colors.from}" stroke-opacity="0.85" stroke-width="1.5" transform="translate(170 240) scale(1.02) translate(-170 -240)" />`
+      : ""
+  }
   <path d="${SHIELD_PATH}" fill="url(#cardBg)" stroke="${colors.text}" stroke-opacity="0.4" stroke-width="3" />
   <path d="${SHIELD_PATH}" fill="none" stroke="${colors.text}" stroke-opacity="0.25" stroke-width="1" transform="translate(170 240) scale(0.965) translate(-170 -240)" />
   <path d="${SHIELD_PATH}" fill="url(#cardTexture)" />
   <path d="${SHIELD_PATH}" fill="url(#cardSheen)" />
+  ${level >= 3 ? `<path d="${SHIELD_PATH}" fill="url(#holoFoil)" />` : ""}
 
   <g clip-path="url(#shieldClip)">
     <text x="170" y="270" font-size="240" font-weight="800" fill="${colors.text}" fill-opacity="0.08" text-anchor="middle" font-family="'Arial Black', Arial, sans-serif">${data.overall}</text>
@@ -86,7 +108,7 @@ export function renderCard(data: CardData): string {
         : ""
     }
 
-    <text x="312" y="34" font-size="12" font-weight="800" fill="${colors.text}" opacity="0.85" text-anchor="end">${data.tier}</text>
+    <text x="312" y="34" font-size="12" font-weight="800" fill="${colors.text}" opacity="0.85" text-anchor="end">${tierLabel}</text>
     <text x="312" y="48" font-size="8" font-weight="700" fill="${colors.text}" opacity="0.55" text-anchor="end">${data.mode === "SCOUT" ? "PDF SCOUT" : "FULL EXPORT"}</text>
 
     <circle cx="170" cy="172" r="66" fill="none" stroke="${colors.text}" stroke-opacity="0.25" stroke-width="1" />
@@ -106,6 +128,12 @@ export function renderCard(data: CardData): string {
         : `<circle cx="170" cy="172" r="64" fill="#ffffff" fill-opacity="0.22" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.45" />
     <text x="170" y="187" font-size="46" font-weight="800" fill="${colors.text}" text-anchor="middle">${escapeXml(initials(data.name))}</text>`
     }
+    ${
+      level >= 4
+        ? laurelBranch(170, 172, 88, 100, 190, 5, "#fff6d8") + laurelBranch(170, 172, 88, 80, -10, 5, "#fff6d8")
+        : ""
+    }
+    ${sparklePositions.map(([x, y, r]) => sparkle(x, y, r, "#ffffff")).join("\n    ")}
 
     <rect x="6" y="266" width="328" height="34" fill="${colors.text}" fill-opacity="0.14" />
     <line x1="6" y1="266" x2="334" y2="266" stroke="${colors.text}" stroke-opacity="0.3" stroke-width="1" />

@@ -1,6 +1,7 @@
 import type { CardData } from "./types.js";
 import { tierColors } from "./scoring.js";
 import { escapeXml, initials, truncate, flagFragment } from "./cardTextUtils.js";
+import { tierLevel, sparkle, holoPatternDefs } from "./tierEffects.js";
 
 // Exported so the interactive card back can match this style too.
 export const BB_CREAM = "#F5F1E8";
@@ -62,6 +63,11 @@ export function renderBaseball(data: CardData): string {
   const nameplateH = 56;
   const footerTop = seamY + nameplateH; // 362
 
+  // Bronze through Gold share this template — TOTY and Icon add a holo-foil
+  // finish and a brighter border so they read as a genuinely rarer pull.
+  const level = tierLevel(data.tier);
+  const tierLabel = level === 4 ? "★ ICON" : data.tier;
+
   return `<svg viewBox="0 0 340 480" xmlns="http://www.w3.org/2000/svg" font-family="${BB_FONT}">
   <defs>
     <linearGradient id="bbPhoto" x1="0" y1="0" x2="1" y2="1">
@@ -72,8 +78,19 @@ export function renderBaseball(data: CardData): string {
       <stop offset="0" stop-color="#ffffff" stop-opacity="0.3" />
       <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
     </radialGradient>
+    ${level >= 3 ? holoPatternDefs("bbHoloFoil") : ""}
   </defs>
 
+  ${
+    level >= 4
+      ? `<rect x="4" y="4" width="332" height="472" rx="10" fill="none" stroke="#fff6d8" stroke-opacity="0.4" stroke-width="9" />`
+      : ""
+  }
+  ${
+    level >= 3
+      ? `<rect x="1.5" y="1.5" width="337" height="477" rx="12" fill="none" stroke="${colors.to}" stroke-opacity="0.9" stroke-width="1.5" />`
+      : ""
+  }
   <rect x="4" y="4" width="332" height="472" rx="10" fill="${BB_CREAM}" stroke="${BB_INK}" stroke-opacity="0.65" stroke-width="2" />
   <rect x="14" y="14" width="312" height="452" rx="6" fill="none" stroke="${BB_INK}" stroke-opacity="0.2" stroke-width="1" />
 
@@ -98,7 +115,9 @@ export function renderBaseball(data: CardData): string {
   <text x="${photoX + 10}" y="${photoY + 18}" font-size="12" font-weight="800" fill="${BB_CREAM}" letter-spacing="0.5">${escapeXml(teamCode(team))}</text>
 
   ${flagFragment(data.flag, photoX + photoW - 42, photoY + 4, 28, 20, BB_CREAM)}
-  <text x="${photoX + photoW - 8}" y="${photoY + 42}" font-size="9" font-weight="800" fill="${BB_CREAM}" fill-opacity="0.85" text-anchor="end" letter-spacing="0.5">${data.tier}</text>
+  <text x="${photoX + photoW - 8}" y="${photoY + 42}" font-size="9" font-weight="800" fill="${BB_CREAM}" fill-opacity="0.85" text-anchor="end" letter-spacing="0.5">${tierLabel}</text>
+  ${level >= 2 ? sparkle(photoX + 16, photoY + 60, 7, "#ffffff") : ""}
+  ${level >= 4 ? sparkle(photoX + photoW - 16, photoY + 60, 7, "#ffffff") : ""}
 
   <text x="170" y="250" font-size="21" font-style="italic" fill="${colors.text}" fill-opacity="0.85" text-anchor="middle" font-family="${BB_SCRIPT}" transform="rotate(-4 170 250)">${escapeXml(data.name.split(" ")[0] ?? "")}</text>
 
@@ -122,5 +141,6 @@ export function renderBaseball(data: CardData): string {
 
   <text x="170" y="${footerTop + 78}" font-size="8" fill="${BB_MUTED}" opacity="0.85" text-anchor="middle" letter-spacing="0.5">SCOUTCARD · FLIP FOR FULL STATS</text>
   <text x="170" y="${footerTop + 94}" font-size="8" fill="${BB_MUTED}" opacity="0.7" text-anchor="middle">No. ${String(data.overall).padStart(2, "0")}/99</text>
+  ${level >= 3 ? `<rect x="14" y="14" width="312" height="452" rx="6" fill="url(#bbHoloFoil)" opacity="0.6" />` : ""}
 </svg>`;
 }

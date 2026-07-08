@@ -199,6 +199,17 @@ rougher guess than the full-export one — its input ranges are much smaller
 (e.g. 0–5 certifications vs. 0–500 endorsements), so there's less intuition
 for what "normal" looks like.
 
+### Tier presentation
+
+Bronze through Gold share one template per style, differing only by color —
+same as real rating cards. TOTY and Icon layer extra effects on top
+([src/tierEffects.ts](src/tierEffects.ts)) so those two actually look like a
+rarer class of card, not just a recolor: TOTY adds a diagonal holo-foil
+finish and a brighter border ring; Icon adds a glowing outer border, extra
+sparkle accents, and — on the FIFA/FUT style only — a laurel wreath framing
+the photo. Gold gets a couple of sparkle accents of its own as the one step
+up from the plain Bronze/Silver look.
+
 The PDF parser recognizes English, Spanish, French, German, and Portuguese
 section headers (LinkedIn renders "Save to PDF" in whatever language the
 *viewer's* UI is set to, not the profile owner's) — other languages degrade
