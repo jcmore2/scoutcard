@@ -201,14 +201,22 @@ for what "normal" looks like.
 
 ### Tier presentation
 
-Bronze through Gold share one template per style, differing only by color —
-same as real rating cards. TOTY and Icon layer extra effects on top
-([src/tierEffects.ts](src/tierEffects.ts)) so those two actually look like a
-rarer class of card, not just a recolor: TOTY adds a diagonal holo-foil
-finish and a brighter border ring; Icon adds a glowing outer border, extra
-sparkle accents, and — on the FIFA/FUT style only — a laurel wreath framing
-the photo. Gold gets a couple of sparkle accents of its own as the one step
-up from the plain Bronze/Silver look.
+On the TCG and baseball styles, Bronze through Gold share one template,
+differing only by color, and TOTY/Icon layer a generic diagonal holo-foil
+finish plus a brighter border on top ([src/tierEffects.ts](src/tierEffects.ts))
+so those two read as a rarer class of card rather than just a recolor. Gold
+gets a couple of sparkle accents of its own as the step up from the plain
+Bronze/Silver look.
+
+The FIFA/FUT style goes further, modeled on official FUT card types
+([src/tierBackgrounds.ts](src/tierBackgrounds.ts)): Bronze gets a "Common"
+dot-stipple texture; Silver and Gold get "Rare"'s dots plus diagonal
+brushstroke bands, recolored per tier the way a real Rare card exists at
+every color; TOTY gets its own fixed "In-Form" identity — a black + gold
+background with a bold diagonal streak and scattered star-dust — regardless
+of the underlying tier gradient; and Icon gets a white/gold "Icon" look with
+marble veining, a gold streak, a glowing border, extra sparkles, and a
+laurel wreath framing the photo.
 
 The PDF parser recognizes English, Spanish, French, German, and Portuguese
 section headers (LinkedIn renders "Save to PDF" in whatever language the
