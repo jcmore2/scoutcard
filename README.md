@@ -71,10 +71,22 @@ to this project. Close the tab and the data is gone.
   downloaded SVGs always show the real value immediately.
 - **Everything else**: a spinner while the PDF parses, a clear error box (icon
   + concrete next step) for an invalid file, an icon-based walkthrough of
-  where "Save to PDF" lives on a profile page, and X/LinkedIn share buttons
-  that link to the site itself, since there's no shareable URL for an
-  individual card. Once a card is generated, hit **"Open a new pack"** to
-  scout another profile, or **"Download card.svg"** to keep the result.
+  where "Save to PDF" lives on a profile page, and LinkedIn/Instagram/TikTok
+  share buttons. None of the three can attach a file from a plain link —
+  LinkedIn's web share intent only takes a text + URL, and Instagram/TikTok
+  don't expose a web compose intent at all, being mobile-app-first — and
+  there's no per-card URL to point any of them at either since nothing is
+  ever stored. So sharing instead rasterizes the current front and back to
+  PNGs and hands them to the OS via the [Web
+  Share API](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share)
+  where supported, so the user picks whichever app from their native share
+  sheet with the actual card attached. Where that's unsupported (most
+  desktop browsers today), it falls back to downloading both PNGs — for
+  LinkedIn that also opens the old text/link compose window, for
+  Instagram/TikTok there's nothing left to open, just a prompt to share the
+  downloaded images from the app itself. Once a card is generated, hit
+  **"Open a new pack"** to scout another profile, or **"Download card.svg"**
+  to keep the result.
 
 ## Flag and company, but no photo or logo
 

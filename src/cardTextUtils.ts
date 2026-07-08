@@ -30,6 +30,25 @@ export function wrapName(name: string, maxCharsPerLine: number): [string] | [str
   return line2 ? [line1, line2] : [line1];
 }
 
+// Greedy word-wrap to an arbitrary number of lines (unlike wrapName's
+// 2-line cap) — used for longer prose like stat descriptions.
+export function wrapText(text: string, maxCharsPerLine: number): string[] {
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    const candidate = current ? `${current} ${word}` : word;
+    if (candidate.length > maxCharsPerLine && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = candidate;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
 export function nameFontSize(longestLine: number): number {
   if (longestLine <= 14) return 22;
   if (longestLine <= 18) return 18;
