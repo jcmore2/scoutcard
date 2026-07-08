@@ -191,6 +191,23 @@ npm run generate:sample  # writes sample/sample-card.svg
 | **DEF** | Education entries |
 | **PHY** | Career span (years since earliest role) |
 
+## Position and archetype
+
+Every card also gets a **position** and **archetype** label (e.g. `ST` /
+"Poacher"), the same idea as GitFut's "shooting spike scouts a poacher"
+logic: whichever of the six stats scores highest picks both, via one shared
+mapping ([src/scoring.ts](src/scoring.ts)) used by both the full-export and
+Scout/PDF formulas:
+
+| Top stat | Position | Archetype |
+|:--:|:--:|:--|
+| PAC | RW | Sprinter |
+| SHO | ST | Poacher |
+| PAS | CAM | Playmaker |
+| DRI | CM | Generalist |
+| DEF | CB | Anchor |
+| PHY | CDM | Veteran |
+
 Raw stats cap at 88, same "legacy gate" idea as GitFut — one good year
 shouldn't crown you an Icon. **These formulas are initial guesses, not
 calibrated against a real distribution of profiles** — expect numbers to feel
