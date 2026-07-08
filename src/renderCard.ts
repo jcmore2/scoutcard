@@ -44,8 +44,20 @@ export function renderCard(data: CardData): string {
   const level = tierLevel(data.tier);
   const tierLabel = level === 4 ? "★ ICON ★" : data.tier;
   const sparklePositions: [number, number, number][] = [];
-  if (level >= 2) sparklePositions.push([100, 122, 7], [240, 122, 7]);
-  if (level >= 4) sparklePositions.push([130, 226, 6], [210, 226, 6]);
+  if (level >= 2) sparklePositions.push([155, 76, 7], [315, 76, 7]);
+  if (level >= 4) sparklePositions.push([155, 228, 6], [315, 228, 6]);
+
+  // A tall arched photo window (not a small circle) — the "hero shot" real
+  // rating cards build the whole layout around — with a soft radial fade
+  // dissolving it into the card's own background near the edges, instead of
+  // a hard crop line.
+  const archX1 = 148;
+  const archX2 = 322;
+  const archBaseY = 95;
+  const archRy = 45;
+  const archBottomY = 250;
+  const archPath = `M ${archX1} ${archBaseY} A ${(archX2 - archX1) / 2} ${archRy} 0 0 1 ${archX2} ${archBaseY} L ${archX2} ${archBottomY} L ${archX1} ${archBottomY} Z`;
+  const archCenterX = (archX1 + archX2) / 2;
 
   const statRow = (
     [key, label]: [keyof CardData["stats"], string],
@@ -94,8 +106,9 @@ export function renderCard(data: CardData): string {
   <g clip-path="url(#shieldClip)">
     <text x="170" y="270" font-size="240" font-weight="800" fill="${colors.text}" fill-opacity="0.08" text-anchor="middle" font-family="'Arial Black', Arial, sans-serif">${data.overall}</text>
 
-    <rect x="158" y="10" width="15" height="15" transform="rotate(45 170 22)" fill="${colors.from}" stroke="${colors.text}" stroke-opacity="0.5" stroke-width="1" />
-    <rect x="161.5" y="13.5" width="8" height="8" transform="rotate(45 170 22)" fill="none" stroke="${colors.text}" stroke-opacity="0.5" stroke-width="0.75" />
+    ${laurelBranch(170, 20, 15, 100, 190, 3, colors.text)}
+    ${laurelBranch(170, 20, 15, 80, -10, 3, colors.text)}
+    <circle cx="170" cy="20" r="5" fill="${colors.from}" stroke="${colors.text}" stroke-opacity="0.6" stroke-width="1" />
 
     <text x="26" y="72" font-size="46" font-weight="800" fill="${colors.text}" font-family="'Arial Black', Arial, sans-serif" data-count-to="${data.overall}">${data.overall}</text>
     <text x="26" y="96" font-size="15" font-weight="700" fill="${colors.text}" opacity="0.9">${escapeXml(data.position)}</text>
@@ -111,26 +124,25 @@ export function renderCard(data: CardData): string {
     <text x="312" y="34" font-size="12" font-weight="800" fill="${colors.text}" opacity="0.85" text-anchor="end">${tierLabel}</text>
     <text x="312" y="48" font-size="8" font-weight="700" fill="${colors.text}" opacity="0.55" text-anchor="end">${data.mode === "SCOUT" ? "PDF SCOUT" : "FULL EXPORT"}</text>
 
-    <circle cx="170" cy="172" r="66" fill="none" stroke="${colors.text}" stroke-opacity="0.25" stroke-width="1" />
-    ${
-      data.photo
-        ? `<defs>
-      <clipPath id="avatarClip"><circle cx="170" cy="172" r="64" /></clipPath>
-      <radialGradient id="avatarMelt" cx="0.5" cy="0.42" r="0.62">
-        <stop offset="0.45" stop-color="${colors.to}" stop-opacity="0" />
+    <defs>
+      <clipPath id="archClip"><path d="${archPath}" /></clipPath>
+      <radialGradient id="archMelt" cx="0.5" cy="0.32" r="0.78">
+        <stop offset="0.5" stop-color="${colors.to}" stop-opacity="0" />
         <stop offset="1" stop-color="${colors.to}" stop-opacity="0.95" />
       </radialGradient>
     </defs>
-    <circle cx="170" cy="172" r="70" fill="${colors.to}" fill-opacity="0.5" />
-    <image href="${data.photo}" x="106" y="108" width="128" height="128" clip-path="url(#avatarClip)" preserveAspectRatio="xMidYMid slice" />
-    <circle cx="170" cy="172" r="64" fill="url(#avatarMelt)" clip-path="url(#avatarClip)" />
-    <circle cx="170" cy="172" r="64" fill="none" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.6" />`
-        : `<circle cx="170" cy="172" r="64" fill="#ffffff" fill-opacity="0.22" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.45" />
-    <text x="170" y="187" font-size="46" font-weight="800" fill="${colors.text}" text-anchor="middle">${escapeXml(initials(data.name))}</text>`
+    ${
+      data.photo
+        ? `<image href="${data.photo}" x="${archX1}" y="${archBaseY - archRy}" width="${archX2 - archX1}" height="${archBottomY - (archBaseY - archRy)}" clip-path="url(#archClip)" preserveAspectRatio="xMidYMid slice" />`
+        : `<path d="${archPath}" fill="#ffffff" fill-opacity="0.2" />
+    <text x="${archCenterX}" y="165" font-size="64" font-weight="800" fill="${colors.text}" fill-opacity="0.8" text-anchor="middle" clip-path="url(#archClip)">${escapeXml(initials(data.name))}</text>`
     }
+    <path d="${archPath}" fill="url(#archMelt)" />
+    <path d="${archPath}" fill="none" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.55" />
     ${
       level >= 4
-        ? laurelBranch(170, 172, 88, 100, 190, 5, "#fff6d8") + laurelBranch(170, 172, 88, 80, -10, 5, "#fff6d8")
+        ? laurelBranch(archCenterX, 150, 112, 100, 260, 6, "#fff6d8") +
+          laurelBranch(archCenterX, 150, 112, 80, -80, 6, "#fff6d8")
         : ""
     }
     ${sparklePositions.map(([x, y, r]) => sparkle(x, y, r, "#ffffff")).join("\n    ")}

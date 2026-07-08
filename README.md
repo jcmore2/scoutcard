@@ -110,9 +110,9 @@ Neither the data export nor the "Save to PDF" export contains a photo
 either, so the web app lets you optionally drop one in after the card is
 generated — processed and embedded locally like everything else, never
 uploaded anywhere. It swaps out the initials-avatar placeholder wherever
-that appears (the FUT shield's circle, the TCG art panel, the baseball
-card's full photo panel) across all three styles and whichever style you
-switch to afterward. Skip it and the initials avatar stays.
+that appears (the FIFA/FUT style's arched photo window, the TCG art panel,
+the baseball card's full photo panel) across all three styles and whichever
+style you switch to afterward. Skip it and the initials avatar stays.
 
 The card back links to the profile's own `linkedin.com/in/...` URL when the
 PDF export includes one — a plain link rather than a QR code, to avoid a
