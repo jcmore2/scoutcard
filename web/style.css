@@ -518,6 +518,10 @@ button.secondary:hover {
 }
 
 footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
   text-align: center;
   margin-top: 48px;
 }
@@ -531,8 +535,34 @@ footer a:hover {
   color: var(--paper);
 }
 
-.footer-divider {
-  color: var(--border);
-  margin: 0 8px;
-  font-size: 0.85rem;
+.bmc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffdd00;
+  color: #1a1400;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 10px 20px;
+  border-radius: 999px;
+  text-decoration: none;
+  box-shadow: 0 3px 0 #c7ac00;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.bmc-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 #c7ac00;
+}
+
+.bmc-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #c7ac00;
+}
+
+.bmc-btn-icon {
+  font-size: 1.1rem;
 }
