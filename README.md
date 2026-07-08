@@ -87,6 +87,11 @@ to this project. Close the tab and the data is gone.
   downloaded images from the app itself. Once a card is generated, hit
   **"Open a new pack"** to scout another profile, or **"Download card.svg"**
   to keep the result.
+- **"See my card in every tier & style"** re-renders your actual name,
+  photo, and stats across all 5 tiers × 3 styles (15 cards) in a single
+  scrollable gallery, purely for browsing the designs — the tier shown in
+  the gallery isn't your real one unless it happens to match, since tier is
+  derived from your actual score, not picked.
 
 ## Flag and company, no auto-extracted photo or logo
 
