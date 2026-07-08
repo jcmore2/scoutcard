@@ -83,11 +83,14 @@ function renderTcgBack(data: CardData): string {
 </svg>`;
 }
 
-// Matches the baseball front's cream cardstock and geometric sans-serif type.
+// Matches the baseball front's cream cardstock, colored team accent, and
+// geometric sans-serif type.
 function renderBaseballBack(data: CardData): string {
+  const colors = tierColors(data.tier);
   return `<svg viewBox="0 0 340 480" xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <rect x="4" y="4" width="332" height="472" rx="14" fill="${BB_CREAM}" stroke="${BB_INK}" stroke-opacity="0.7" stroke-width="2" />
-  <rect x="14" y="14" width="312" height="452" rx="8" fill="none" stroke="${BB_INK}" stroke-opacity="0.25" stroke-width="1" />
+  <rect x="4" y="4" width="332" height="472" rx="10" fill="${BB_CREAM}" stroke="${BB_INK}" stroke-opacity="0.65" stroke-width="2" />
+  <rect x="14" y="14" width="312" height="10" fill="${colors.to}" />
+  <rect x="14" y="14" width="312" height="452" rx="6" fill="none" stroke="${BB_INK}" stroke-opacity="0.2" stroke-width="1" />
   <foreignObject x="14" y="14" width="312" height="452">
     <xhtml:div class="back-face" style="color: ${BB_INK}; font-family: ${BB_FONT}; padding: 22px 22px 18px;">
       ${backContentHtml(data)}
