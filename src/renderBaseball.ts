@@ -79,8 +79,15 @@ export function renderBaseball(data: CardData): string {
 
   ${
     data.photo
-      ? `<clipPath id="bbPhotoClip"><rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" /></clipPath>
+      ? `<defs>
+    <clipPath id="bbPhotoClip"><rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" /></clipPath>
+    <linearGradient id="bbPhotoMelt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0.62" stop-color="${colors.to}" stop-opacity="0" />
+      <stop offset="1" stop-color="${colors.to}" stop-opacity="1" />
+    </linearGradient>
+  </defs>
   <image href="${data.photo}" x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" clip-path="url(#bbPhotoClip)" preserveAspectRatio="xMidYMid slice" />
+  <rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="url(#bbPhotoMelt)" clip-path="url(#bbPhotoClip)" />
   <rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="none" stroke="${BB_INK}" stroke-opacity="0.3" stroke-width="1" />`
       : `<rect x="${photoX}" y="${photoY}" width="${photoW}" height="${photoH}" fill="url(#bbPhoto)" stroke="${BB_INK}" stroke-opacity="0.3" stroke-width="1" />
   <text x="170" y="${photoY + photoH / 2}" dominant-baseline="central" text-anchor="middle" font-size="150" font-weight="800" fill="${colors.text}" fill-opacity="0.14">${escapeXml(initials(data.name))}</text>`

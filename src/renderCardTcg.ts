@@ -149,8 +149,15 @@ export function renderCardTcg(data: CardData): string {
   <rect x="20" y="${artY - 1}" width="300" height="${artHeight + 2}" rx="9" fill="none" stroke="${BORDER_EDGE}" stroke-opacity="0.7" stroke-width="1.5" />
   ${
     data.photo
-      ? `<clipPath id="tcgArtClip"><rect x="21" y="${artY}" width="298" height="${artHeight}" rx="8" /></clipPath>
-  <image href="${data.photo}" x="21" y="${artY}" width="298" height="${artHeight}" clip-path="url(#tcgArtClip)" preserveAspectRatio="xMidYMid slice" />`
+      ? `<defs>
+    <clipPath id="tcgArtClip"><rect x="21" y="${artY}" width="298" height="${artHeight}" rx="8" /></clipPath>
+    <linearGradient id="tcgArtMelt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0.5" stop-color="${colors.to}" stop-opacity="0" />
+      <stop offset="1" stop-color="${colors.to}" stop-opacity="0.9" />
+    </linearGradient>
+  </defs>
+  <image href="${data.photo}" x="21" y="${artY}" width="298" height="${artHeight}" clip-path="url(#tcgArtClip)" preserveAspectRatio="xMidYMid slice" />
+  <rect x="21" y="${artY}" width="298" height="${artHeight}" fill="url(#tcgArtMelt)" clip-path="url(#tcgArtClip)" />`
       : `<rect x="21" y="${artY}" width="298" height="${artHeight}" rx="8" fill="url(#tcgArt)" stroke="${INK}" stroke-opacity="0.2" />
   <circle cx="170" cy="${artY + artHeight / 2}" r="42" fill="#ffffff" fill-opacity="0.3" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.4" />
   <text x="170" y="${artY + artHeight / 2 + 9}" font-size="28" font-weight="800" fill="${colors.text}" text-anchor="middle">${escapeXml(initials(data.name))}</text>`

@@ -92,9 +92,17 @@ export function renderCard(data: CardData): string {
     <circle cx="170" cy="172" r="66" fill="none" stroke="${colors.text}" stroke-opacity="0.25" stroke-width="1" />
     ${
       data.photo
-        ? `<clipPath id="avatarClip"><circle cx="170" cy="172" r="64" /></clipPath>
+        ? `<defs>
+      <clipPath id="avatarClip"><circle cx="170" cy="172" r="64" /></clipPath>
+      <radialGradient id="avatarMelt" cx="0.5" cy="0.42" r="0.62">
+        <stop offset="0.45" stop-color="${colors.to}" stop-opacity="0" />
+        <stop offset="1" stop-color="${colors.to}" stop-opacity="0.95" />
+      </radialGradient>
+    </defs>
+    <circle cx="170" cy="172" r="70" fill="${colors.to}" fill-opacity="0.5" />
     <image href="${data.photo}" x="106" y="108" width="128" height="128" clip-path="url(#avatarClip)" preserveAspectRatio="xMidYMid slice" />
-    <circle cx="170" cy="172" r="64" fill="none" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.45" />`
+    <circle cx="170" cy="172" r="64" fill="url(#avatarMelt)" clip-path="url(#avatarClip)" />
+    <circle cx="170" cy="172" r="64" fill="none" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.6" />`
         : `<circle cx="170" cy="172" r="64" fill="#ffffff" fill-opacity="0.22" stroke="${colors.text}" stroke-width="2" stroke-opacity="0.45" />
     <text x="170" y="187" font-size="46" font-weight="800" fill="${colors.text}" text-anchor="middle">${escapeXml(initials(data.name))}</text>`
     }
